@@ -1,0 +1,254 @@
+<html>  
+<head>
+   <meta http-equiv=”Content-Language” content=”es”/>
+   <meta charset="utf-8">
+   <title>Swagger2Postman - Modo de uso</title>   
+   
+<style>
+
+body {
+  background-color: #eee;  
+  
+}
+
+
+.content-wrapper {
+  background-color: white;
+  padding: 2em;
+  max-width: 960px;
+  margin-right: auto;
+  margin-left: auto;
+}
+
+.content > * {
+  margin-right: auto;
+  margin-left: auto;
+  font-family: "Lucida Sans";
+  font-size: 18px;
+}
+
+.content > h1 {
+	font-size: 2em;
+}
+
+.content > h2 {
+	font-size: 1.5em;
+	padding-top:1.5em;
+	padding-top:1em;
+}
+
+.content > p {
+  max-width: 900px;
+}
+
+.content > pre {
+  max-width: 850px;
+}
+
+.content figure {
+  margin-top: 2em;
+  margin-bottom: 2em;
+}
+
+.content figure img {
+  display: block;
+  margin-right: auto;
+  margin-left: auto;
+}
+
+.content figcaption {
+  margin-top: 1em;
+  font-size: 14px;
+  text-align: center;
+}
+
+.content a {
+  color: #e74c3c;
+}
+
+.content em {
+   font-family: Arial, Helvetica, sans-serif;
+   color: #800000;
+}
+
+.content > pre {
+  color: #000080;
+}
+
+.content a:hover,
+.content a:active,
+.content a:focus {
+  color: currentColor;
+}
+
+.content table, .content th, .content td {
+  border: 1px solid black;
+
+}
+
+.content th, .content td {
+  padding: 3px 10px;
+}
+
+.content th {
+   background-color: #e8ebff;
+}
+
+.content table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.content tr:nth-child(even) {
+  background-color: #e8ebff;
+}
+
+</style>
+</head>
+
+
+<body>
+
+<div class="container">
+<div class="content-wrapper">
+<div class="content">
+
+<h1 id="swagger2postman">Swagger2Postman</h1>
+<p><em>Versión: 3.0.2 - 2024-04-17</em></p>
+<h2 id="descripci-n">Descripción</h2>
+<p>Swagger2postman es una herramienta desarrollada en node.js cuya funcionalidad es generar
+   colecciones postman y ficheros de variables postman a partir de un fichero swagger en formato .yaml
+</p>
+<p>Usa un fichero llamado <strong>config.json</strong> que permite configurar la generación de esta colecciones. Por defecto este fichero tiene la configuración para seguir la normativa de generación de colecciones postman de la Comunidad de Madrid</p>
+<h2 id="preparacion-del-entorno">Preparacion del entorno</h2>
+<p>Swagger2postman es un ejecutable desarrollado en node.js
+   Para el uso de swagger2postman se debe tener instalado node y npm 
+</p>
+<p>Descarga de Node.js y npm: <a href="https://nodejs.org/es/download/">https://nodejs.org/es/download/</a> </p>
+<h3 id="primera-instalaci-n">Primera instalación</h3>
+<pre><code>Si <span class="hljs-keyword">no</span> existe <span class="hljs-keyword">el</span> directorio <span class="hljs-string">"node_modules"</span> habrá que hacer <span class="hljs-keyword">una</span> instalación
+* Abrir una consola de comandos <span class="hljs-keyword">con</span> <span class="hljs-string">"cmd"</span>
+* Ejecutar: <span class="hljs-string">"npm install"</span>
+* Esto compilará Swagger2Postman <span class="hljs-keyword">y</span> <span class="hljs-keyword">lo</span> dejará listo para su uso
+</code></pre>
+<h2 id="directorios">Directorios</h2>
+<p>Se recomienda usar los siguientes directorios:</p>
+<ul>
+   <li>
+      <em>Swagger_files</em>: donde estarán los swagger (ficheros yaml) con los que generar las colecciones de prueba
+   </li>
+   <li>
+      <em>Postman_files</em>: donde se dejarán los postman generados con las colecciones generadas
+   </li>
+</ul>
+<h2 id="ejecuci-n-con-swagger2postman-bat">Ejecución con Swagger2Postman.bat</h2>
+<p>La ejecución recomendada de swagger2postman en windows se hará a través de bat: <strong>swagger2posman.bat</strong></p>
+<pre><code><span class="hljs-selector-tag">swagger2postman</span><span class="hljs-selector-class">.bat</span> &lt;<span class="hljs-selector-tag">fichero</span><span class="hljs-selector-class">.yaml</span>&gt; &lt;<span class="hljs-selector-tag">nombreapi</span>&gt; <span class="hljs-selector-attr">[config.json]</span>"
+</code></pre>
+<p>En la ejecución por defecto no hay que pasar el parametro &quot;config.json&quot;.
+   Los ficheros yaml deben estar en el directorio <em>Swagger_files</em>
+   Los ficheros postman se dejan en el directorio <em>Postman_files</em>
+</p>
+<h3 id="ejemplo-de-ejecuci-n">Ejemplo de ejecución</h3>
+<pre><code>swagger2postman<span class="hljs-selector-class">.bat</span> plantilla_definicion_API<span class="hljs-selector-class">.yaml</span> plantilla
+</code></pre>
+<h3 id="resultado-de-la-ejecuci-n">Resultado de la ejecución</h3>
+<p>El resultado de la ejecución quedará en el directorio <em>Postman_files</em>.
+   Se generarán 6 ficheros postman por cada fichero .yaml
+</p>
+<table>
+   <thead>
+      <tr>
+         <th>Fichero</th>
+         <th>Descripción</th>
+      </tr>
+   </thead>
+   <tbody>
+      <tr>
+         <td>%api_name%_01_pre_backend.postman_colection</td>
+         <td>Colección para pruebas en desarrollo sin pasar por el API Manager</td>
+      </tr>
+      <tr>
+         <td>%api_name%_01_pre_backend.postman_environment</td>
+         <td>Variables de entorno para pruebas en desarrollo sin pasar por el API Manager</td>
+      </tr>
+      <tr>
+         <td>%api_name%_02_pre_apim.postman_colection</td>
+         <td>Colección para pruebas a través del API Manager de validación</td>
+      </tr>
+      <tr>
+         <td>%api_name%_02_pre_apim.postman_environment</td>
+         <td>Variables de entorno para pruebas a través del API Manager de validación</td>
+      </tr>
+      <tr>
+         <td>%api_name%_03_pro_apim.postman_colection</td>
+         <td>Colección para pruebas en producción a través del API Manager de producción</td>
+      </tr>
+      <tr>
+         <td>%api_name%_03_pro_apim.postman_environment</td>
+         <td>Variables de entorno para pruebas en producción a través del API Manager de producción</td>
+      </tr>
+   </tbody>
+</table>
+<h2 id="fichero-config-json">Fichero config.json</h2>
+<p>En este fichero se configuran las colecciones a generar
+   y los valores por defecto de las variables para los test de ok y de error.
+</p>
+<p>Si no se pasa el tercer parámetro se usará el config.json por defecto
+   Si se desea, se puede usar otro fichero .json de configuración distinto y pasar como tercer parámetro la ruta de este fichero
+</p>
+<table>
+   <thead>
+      <tr>
+         <th>Variable</th>
+         <th>Comentario</th>
+      </tr>
+   </thead>
+   <tbody>
+      <tr>
+         <td>is_inline</td>
+         <td>Indica si los valores de los ejemplos de los test_case estará inline (directamente escritos en cada caso) o en el fichero de environment mediante variables</td>
+      </tr>
+      <tr>
+         <td>examples/sucessful</td>
+         <td>Valores de ejemplo para cada tipo de dato en los test sucessful, siempre que no exista en el swagger un &quot;example&quot;</td>
+      </tr>
+      <tr>
+         <td>examples/wrong</td>
+         <td>Valores de ejemplo para cada tipo de dato en los test wrong, siempre que no exista en el swagger un &quot;example&quot;</td>
+      </tr>
+      <tr>
+         <td>enviroments</td>
+         <td>Configuracion de los distintos enviroment a generar (explicados en &quot;Resultado de la ejecución&quot;). Dentro de cada enviroment hay variables para configurar ese enviornment</td>
+      </tr>
+      <tr>
+         <td>target_folder</td>
+         <td>Directorio de salida donde se dejarán los ficheros Postman</td>
+      </tr>
+      <tr>
+         <td>validate_schema</td>
+         <td>Indica si en cada test case se va a validar el Json de respuesta en base al esquema del swagger</td>
+      </tr>
+      <tr>
+         <td>has_scopes</td>
+         <td>Indica si la colección tendrá pruebas con scopes. En ese caso se generarán test case duplicados para probar con cada scope a probar el API Manager</td>
+      </tr>
+      <tr>
+         <td>number_of_scopes</td>
+         <td>Número de scopes a probar. Serán los que se hayan definido para ese API concreto</td>
+      </tr>
+      <tr>
+         <td>application_token</td>
+         <td>Indica si la colección tendrá pruebas con token de aplicación. Será lo que se haya definido para ese API concreto</td>
+      </tr>
+   </tbody>
+</table>
+<p>Leer también el documento /docs/swagger2postman-Archivo_de_configuracion.pdf</p>
+<h2 id="documentaci-n">Documentación</h2>
+<p>Tiene más información de uso en el directorio <em>/docs/</em></p>
+
+</div>  <!-- content -->
+</div>  <!-- content wrapper -->
+</div>  <!-- container -->
+
+</body></html>

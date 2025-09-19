@@ -1,0 +1,16 @@
+{
+    "headers": {
+        "x-trace-id": "12345abcde",
+        "accept": "application/json"
+    },
+    "baseUrl": "http://localhost:8080/",
+    "endpoints": {
+        "moduloTecnico": "apis/modulo/{modulo_tecnico}",
+        "apiInfo": "apis/{uuid}"
+    },
+    "fields": {
+        "uuidField": "uuid",
+        "uuidArrayPath": "data",
+        "swaggerField": "definicion"
+    }
+}

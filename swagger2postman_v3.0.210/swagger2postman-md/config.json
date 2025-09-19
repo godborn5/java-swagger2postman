@@ -1,0 +1,65 @@
+{
+	"api_name": "",
+    "is_inline": true,
+    "schema_is_inline": false,
+	"schema_pretty_print": true,
+    "examples" : {
+        "wrong" : {
+            "string" : "badstring",
+            "number" : -9999,
+            "boolean" : false,
+            "object" : "badobject",
+            "array" : "badarray",
+            "date": "2020-40-40",
+            "date_time": "2000-40-40T00:00:00"
+        },
+        "successful" : {
+            "string" : "goodstring",
+            "number" : 1,
+            "boolean" : true,
+            "date": "2000-01-01",
+            "date_time": "2000-01-01T23:59:59"
+        }
+    },
+    "environments":[
+        {
+            "name" : "BACKEND",
+            "postman_collection_name": "%api_name%_01_pre_backend",
+            "postman_environment_name": "%api_name%_01_pre_backend",
+            "host": "https://localhost",
+            "port": "8080",
+            "target_folder": "Postman_files",
+			"validate_schema": false,
+            "has_scopes": false,
+			"number_of_scopes": 0,
+            "application_token": false
+        },
+        {
+            "name" : "APIM",
+            "postman_collection_name": "%api_name%_02_pre_apim",
+            "postman_environment_name": "%api_name%_02_pre_apim_environment",
+            "host": "https://apiscm.val.comunidad.madrid",
+            "port": "",
+            "target_folder": "Postman_files",
+			"validate_schema": true,
+			"custom_authorizations_file" : "./authorizations.postman_collection.json",
+            "has_scopes": true,
+			"number_of_scopes": 3,
+            "application_token": true
+        },
+        {
+            "name" : "PRODUCTION",
+            "postman_collection_name": "%api_name%_03_pro_apim",
+            "postman_environment_name": "%api_name%_03_pro_apim_environment",
+            "host": "https://apiscm.comunidad.madrid",
+            "port": "",
+            "target_folder": "Postman_files",
+			"validate_schema": true,
+			"custom_authorizations_file" : "./authorizations.postman_collection.json",
+			"read_only" :true,
+            "has_scopes": true,
+			"number_of_scopes": 3,
+            "application_token": true
+        }
+    ]
+}

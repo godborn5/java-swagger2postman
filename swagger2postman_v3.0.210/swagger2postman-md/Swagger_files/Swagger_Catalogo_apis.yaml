@@ -1,0 +1,2870 @@
+openapi: 3.0.0
+info:
+  title: PINT-Catalogo-Apis
+  description: >
+    ----
+
+    ### Descripción de la API
+
+    API que ofrece distintas utilidades del API Manager para consumo interno.
+
+    Permite obtener listados de APIs, filtrarlos en función de su módulo
+    técnico, obtener sucripciones, etc.
+
+    ----
+  contact:
+    name: Marcos Carretero Poblete
+    email: marcos.carretero@cloudappi.net
+  version: v1
+servers:
+  - url: >-
+      https://apiscmintra.val.comunidad.madrid/t/dacm.comunidad.madrid/tec/gob-api/catalogo-apis/v1
+security:
+  - default: []
+tags:
+  - name: modulos-tecnicos (consultas)
+    description: >-
+      Agrupa las consultas sobre el recurso modulos-tecnicos, ya sean
+      individuales o sobre la colección completa.
+  - name: apis (consultas)
+    description: >-
+      Agrupa las consultas sobre el recurso APIs, ya sean individuales o sobre
+      la colección completa.
+  - name: productos (consultas)
+    description: >-
+      Agrupa las consultas sobre el recurso productos, ya sean individuales o
+      sobre la colección completa.
+  - name: monitorización
+    description: Etiqueta a aplicar al endpoint /status
+paths:
+  /modulos-tecnicos/{modulo_tecnico}/apis:
+    get:
+      tags:
+        - modulos-tecnicos (consultas)
+      summary: Obtención de un listado de APIs en función de su módulo técnico
+      description: >
+        Permite obtener una colección de APIs a partir de un módulo técnico
+        proporcionado por parámetro del path.
+
+        Las APIs recuperadas de esta manera se encontrarán únicamente en el
+        estado `PUBLISHED`. Los productos no se recuperarán con este endpoint.
+
+        Admite cabeceras y *query parameters*.
+      parameters:
+        - $ref: '#/components/parameters/standard_init_param'
+        - $ref: '#/components/parameters/standard_limit_param'
+        - $ref: '#/components/parameters/standard_total_param'
+        - $ref: '#/components/parameters/standard_select_param'
+        - $ref: '#/components/parameters/standard_exclude_param'
+        - $ref: '#/components/parameters/standard_expand_param'
+        - $ref: '#/components/parameters/standard_order_by_param'
+        - $ref: '#/components/parameters/modulo_tecnico_param'
+        - $ref: '#/components/parameters/standard_trace_id_header_param'
+      responses:
+        '206':
+          $ref: '#/components/responses/apis_response'
+        '400':
+          $ref: '#/components/responses/standard_bad_request_response'
+        '401':
+          $ref: '#/components/responses/standard_unauthorized_response'
+        '403':
+          $ref: '#/components/responses/standard_forbidden_response'
+        '404':
+          $ref: '#/components/responses/standard_unauthorized_response'
+        '429':
+          $ref: '#/components/responses/standard_too_many_requests_response'
+        default:
+          $ref: '#/components/responses/standard_server_error_response'
+      security:
+        - default: []
+      x-throttling-tier: Unlimited
+      x-auth-type: Application & Application User
+  /modulos-tecnicos/{modulo_tecnico}/productos:
+    get:
+      tags:
+        - modulos-tecnicos (consultas)
+      summary: Obtención de un listado de productos en función de su módulo técnico
+      description: >
+        Permite obtener una colección de productos a partir de un módulo técnico
+        proporcionado por parámetro del path.
+
+        Los productos recuperados de esta manera se encontrarán únicamente en el
+        estado `PUBLISHED`. Las APIs no se recuperarán con este endpoint.
+
+        Admite cabeceras y *query parameters*.
+      parameters:
+        - $ref: '#/components/parameters/standard_init_param'
+        - $ref: '#/components/parameters/standard_limit_param'
+        - $ref: '#/components/parameters/standard_total_param'
+        - $ref: '#/components/parameters/standard_select_param'
+        - $ref: '#/components/parameters/standard_exclude_param'
+        - $ref: '#/components/parameters/standard_expand_param'
+        - $ref: '#/components/parameters/standard_order_by_param'
+        - $ref: '#/components/parameters/modulo_tecnico_param'
+        - $ref: '#/components/parameters/standard_trace_id_header_param'
+      responses:
+        '206':
+          $ref: '#/components/responses/productos_response'
+        '400':
+          $ref: '#/components/responses/standard_bad_request_response'
+        '401':
+          $ref: '#/components/responses/standard_unauthorized_response'
+        '403':
+          $ref: '#/components/responses/standard_forbidden_response'
+        '404':
+          $ref: '#/components/responses/standard_unauthorized_response'
+        '429':
+          $ref: '#/components/responses/standard_too_many_requests_response'
+        default:
+          $ref: '#/components/responses/standard_server_error_response'
+      security:
+        - default: []
+      x-throttling-tier: Unlimited
+      x-auth-type: Application & Application User
+  /apis:
+    get:
+      tags:
+        - apis (consultas)
+      summary: Obtención de un listado de APIs
+      description: >
+        Permite obtener una colección de APIs publicadas.
+
+        Las APIs recuperadas de esta manera se encontrarán únicamente en el
+        estado `PUBLISHED`. Los productos no se recuperarán con este endpoint.
+
+        Admite cabeceras y *query parameters*.
+      parameters:
+        - $ref: '#/components/parameters/standard_init_param'
+        - $ref: '#/components/parameters/standard_limit_param'
+        - $ref: '#/components/parameters/standard_total_param'
+        - $ref: '#/components/parameters/standard_select_param'
+        - $ref: '#/components/parameters/standard_exclude_param'
+        - $ref: '#/components/parameters/standard_expand_param'
+        - $ref: '#/components/parameters/standard_order_by_param'
+        - $ref: '#/components/parameters/standard_trace_id_header_param'
+      responses:
+        '206':
+          $ref: '#/components/responses/lista_apis_response'
+        '400':
+          $ref: '#/components/responses/standard_bad_request_response'
+        '401':
+          $ref: '#/components/responses/standard_unauthorized_response'
+        '403':
+          $ref: '#/components/responses/standard_forbidden_response'
+        '429':
+          $ref: '#/components/responses/standard_too_many_requests_response'
+        default:
+          $ref: '#/components/responses/standard_server_error_response'
+      security:
+        - default: []
+      x-throttling-tier: Unlimited
+      x-auth-type: Application & Application User
+  /apis/{uuid_api}:
+    get:
+      tags:
+        - apis (consultas)
+      summary: Obtención de una API en función de su indetificador único
+      description: |
+        Permite obtener una API a partir de su identificador único.
+        Dicho identificador es un parámetro que se pasa mediante el path.
+        Admite cabeceras y *query parameters*.
+      parameters:
+        - $ref: '#/components/parameters/standard_select_param'
+        - $ref: '#/components/parameters/standard_exclude_param'
+        - $ref: '#/components/parameters/standard_expand_param'
+        - $ref: '#/components/parameters/uuid_api_param'
+        - $ref: '#/components/parameters/standard_trace_id_header_param'
+      responses:
+        '200':
+          $ref: '#/components/responses/api_response'
+        '400':
+          $ref: '#/components/responses/standard_bad_request_response'
+        '401':
+          $ref: '#/components/responses/standard_unauthorized_response'
+        '403':
+          $ref: '#/components/responses/standard_forbidden_response'
+        '404':
+          $ref: '#/components/responses/standard_unauthorized_response'
+        '429':
+          $ref: '#/components/responses/standard_too_many_requests_response'
+        default:
+          $ref: '#/components/responses/standard_server_error_response'
+      security:
+        - default: []
+      x-throttling-tier: Unlimited
+      x-auth-type: Application & Application User
+  /apis/{uuid_api}/suscripciones:
+    get:
+      tags:
+        - apis (consultas)
+      summary: Obtención de un listado de suscripciones para una API específica
+      description: >
+        Permite obtener una colección de suscripciones a una API a partir del
+        identificador único de dicha API.
+
+        Este endpoint recupera todas las suscripciones de la API,
+        independientemente del usuario creador de la misma.
+
+        Admite cabeceras y *query parameters*.
+      parameters:
+        - $ref: '#/components/parameters/standard_init_param'
+        - $ref: '#/components/parameters/standard_limit_param'
+        - $ref: '#/components/parameters/standard_total_param'
+        - $ref: '#/components/parameters/standard_select_param'
+        - $ref: '#/components/parameters/standard_exclude_param'
+        - $ref: '#/components/parameters/standard_expand_param'
+        - $ref: '#/components/parameters/standard_order_by_param'
+        - $ref: '#/components/parameters/uuid_api_param'
+        - $ref: '#/components/parameters/standard_trace_id_header_param'
+      responses:
+        '206':
+          $ref: '#/components/responses/suscripciones_response'
+        '400':
+          $ref: '#/components/responses/standard_bad_request_response'
+        '401':
+          $ref: '#/components/responses/standard_unauthorized_response'
+        '403':
+          $ref: '#/components/responses/standard_forbidden_response'
+        '404':
+          $ref: '#/components/responses/standard_unauthorized_response'
+        '429':
+          $ref: '#/components/responses/standard_too_many_requests_response'
+        default:
+          $ref: '#/components/responses/standard_server_error_response'
+      security:
+        - default: []
+      x-throttling-tier: Unlimited
+      x-auth-type: Application & Application User
+  /apis/{uuid_api}/definiciones:
+    get:
+      tags:
+        - apis (consultas)
+      summary: Obtención de la definición de una API
+      description: >
+        Permite obtener el fichero JSON con la definición de la API a partir de
+        su identificador único.
+
+        Este endpoint no devuelve una respuesta de éxito estándar.
+      parameters:
+        - $ref: '#/components/parameters/standard_select_param'
+        - $ref: '#/components/parameters/standard_exclude_param'
+        - $ref: '#/components/parameters/standard_expand_param'
+        - $ref: '#/components/parameters/uuid_api_param'
+        - $ref: '#/components/parameters/standard_trace_id_header_param'
+      responses:
+        '200':
+          $ref: '#/components/responses/definicion_api_response'
+        '400':
+          $ref: '#/components/responses/standard_bad_request_response'
+        '401':
+          $ref: '#/components/responses/standard_unauthorized_response'
+        '403':
+          $ref: '#/components/responses/standard_forbidden_response'
+        '404':
+          $ref: '#/components/responses/standard_unauthorized_response'
+        '429':
+          $ref: '#/components/responses/standard_too_many_requests_response'
+        default:
+          $ref: '#/components/responses/standard_server_error_response'
+      security:
+        - default: []
+      x-auth-type: None
+      x-throttling-tier: Unlimited
+  /productos:
+    get:
+      tags:
+        - productos (consultas)
+      summary: Obtención de un listado de productos
+      description: >
+        Permite obtener una colección de productos publicados.
+
+        Los productos recuperados de esta manera se encontrarán únicamente en el
+        estado `PUBLISHED`. Las APIs no se recuperarán con este endpoint.
+
+        Admite cabeceras y *query parameters*.
+      parameters:
+        - $ref: '#/components/parameters/standard_init_param'
+        - $ref: '#/components/parameters/standard_limit_param'
+        - $ref: '#/components/parameters/standard_total_param'
+        - $ref: '#/components/parameters/standard_select_param'
+        - $ref: '#/components/parameters/standard_exclude_param'
+        - $ref: '#/components/parameters/standard_expand_param'
+        - $ref: '#/components/parameters/standard_order_by_param'
+        - $ref: '#/components/parameters/standard_trace_id_header_param'
+      responses:
+        '206':
+          $ref: '#/components/responses/lista_productos_response'
+        '400':
+          $ref: '#/components/responses/standard_bad_request_response'
+        '401':
+          $ref: '#/components/responses/standard_unauthorized_response'
+        '403':
+          $ref: '#/components/responses/standard_forbidden_response'
+        '429':
+          $ref: '#/components/responses/standard_too_many_requests_response'
+        default:
+          $ref: '#/components/responses/standard_server_error_response'
+      security:
+        - default: []
+      x-throttling-tier: Unlimited
+      x-auth-type: Application & Application User
+  /status:
+    get:
+      tags:
+        - monitorización
+      summary: Endpoint de monitorización de la API
+      description: >
+        Propuesta de definición de la respuesta que debería ofrecer el endpoint
+        de monitorización previsto en el estándar.
+
+        Se subdivide en comprobación de infraestructura y comprobación
+        funcional. En la de infraestructura se especifican Los
+
+        sistemas probados y el estado de los mismos. En la funcional se deben
+        hacer algunas llamadas a métodos GET de la API y 
+
+        especificar el código de estado HTTP que devuelven. Idealmente deben
+        responder con códigos 2xx o 4xx. Los códigos 5xx
+
+        deben setear el campo status del objeto result a _false_
+      responses:
+        '200':
+          $ref: '#/components/responses/standard_status_endpoint_response'
+        '400':
+          $ref: '#/components/responses/standard_bad_request_response'
+        '401':
+          $ref: '#/components/responses/standard_unauthorized_response'
+        '403':
+          $ref: '#/components/responses/standard_forbidden_response'
+        '429':
+          $ref: '#/components/responses/standard_too_many_requests_response'
+        default:
+          $ref: '#/components/responses/standard_server_error_response'
+      security:
+        - default: []
+      x-auth-type: None
+      x-throttling-tier: Unlimited
+components:
+  schemas:
+    standard_response:
+      required:
+        - result
+      type: object
+      description: >
+        Respuesta estándar cuando un recurso devuelve un solo elemento
+
+        Debe usarse en los recursos que consultan o modifican un recurso por su
+        identificador.
+
+        También debe usarse en las respuestas de error aunque no devuelvan datos
+        del recurso.
+
+        En esta plantilla dichas respuestas son reutilizables y ya referencian
+        este modelo.
+      allOf:
+        - $ref: '#/components/schemas/standard_response_result'
+    standard_response_with_metadata:
+      required:
+        - result
+      type: object
+      description: >
+        Respuesta estándar cuando un recurso devuelve una lista de elementos
+
+        Debe usarse en los recursos que devuelven listados paginados
+        cumplimentando el objeto metadata.
+
+        En los errores se aplica la misma política que en los endpoints que
+        devuelven un solo recurso.
+      allOf:
+        - $ref: '#/components/schemas/standard_response_result'
+        - $ref: '#/components/schemas/standard_response_metadata'
+    standard_response_result:
+      type: object
+      properties:
+        result:
+          required:
+            - http_code
+            - status
+            - trace_id
+          type: object
+          properties:
+            status:
+              type: boolean
+              description: Resultado de éxito o error de la operación
+              example: true
+            http_code:
+              type: integer
+              description: Código http de la respuesta.
+              format: int32
+              example: 200
+            info:
+              type: string
+              description: Breve mensaje indicando si la operación fue exitosa o no.
+              example: Solicitud realizada con éxito.
+            errors:
+              type: array
+              description: >-
+                Array de errores. Opcional. Se usará cuando se haya producido al
+                menos un error, pudiéndose especificar tódos los que se hayan
+                producido.
+              items:
+                $ref: '#/components/schemas/standard_error'
+            stack_trace:
+              type: array
+              description: >-
+                Array que recoge los errores en caso de que sea necesario
+                facilitar la depuración. Solo se incluirá en el entorno de
+                desarrollo.
+              items:
+                type: object
+                properties:
+                  method_name:
+                    type: string
+                    description: Método
+                    example: readJavaType
+                  file_name:
+                    type: string
+                    description: Nombre del archivo
+                    example: archivo.java
+                  line_number:
+                    type: integer
+                    description: Número de línea
+                    format: int32
+                    example: 36
+                  class_name:
+                    type: string
+                    description: Clase
+                    example: >-
+                      org.springframework.http.converter.json.AbstractJackson2HttpMessageConverter
+                  native_method:
+                    type: boolean
+                    description: Método nativo
+                    example: false
+            trace_id:
+              type: string
+              description: >-
+                Identificador de la petición en el sistema de logging para
+                facilitar la depuración de errores. Contenido de la cabecera
+                x-trace-id.
+              example: b8240028-8df4-4019-8b03-182a0a9bc88d
+            updated_elements:
+              type: integer
+              description: >-
+                Número de elementos borrados o modificados cuando se reciben
+                llamadas con métodos PUT o DELETE sobre varios recursos.
+                Obligatorio para borrados lógicos.
+              format: int32
+              example: 0
+      description: >
+        Objeto result que tienen que devolver todos los recursos, correctos o
+        incorrectos.
+
+        Los campos que SIEMPRE se devolverán en este objeto son status,
+        http_code y trace_id.
+
+        El uso del resto de campos está descrito brevemente en sus propias
+        descripciones, pero debe
+
+        consultarse el estándar de definición de APIs de MD para más
+        información.
+    standard_response_metadata:
+      properties:
+        metadata:
+          type: object
+          properties:
+            paging:
+              $ref: '#/components/schemas/standard_paging'
+      description: >
+        Este objeto se usa en respuestas paginadas. Está incluido en el modelo
+        de respuesta estándar con metadatos
+
+        standard_response_with_metadata, por lo que no es necesario
+        referenciarlo directamente.
+    standard_error:
+      required:
+        - code
+        - message
+      type: object
+      properties:
+        code:
+          type: integer
+          description: >-
+            Codigo de error devuelto por la API. Se especificarán códigos de
+            errores controlados. En el caso de errores no controlados se
+            especificará si es posible. De lo contrario se deberá indicar un
+            código 500.
+          format: int32
+          example: 1003
+        message:
+          type: string
+          description: Descripción textual del error devuelto
+          example: Atributo con valor superior al máximo
+      description: |
+        Modelo de error estándar a usar cuando se rellena el array de errores.
+        Ya está referenciado en la respuesta estándar.
+    standard_paging:
+      required:
+        - init
+        - limit
+        - links
+      type: object
+      properties:
+        init:
+          type: integer
+          description: Registro inicial de la página.
+          format: int32
+          example: 3
+        limit:
+          type: integer
+          description: Tamaño de página.
+          format: int32
+          example: 5
+        total:
+          type: integer
+          description: Número total de registros.
+          format: int32
+          example: 35
+        num_page:
+          type: integer
+          description: Número de la página actual.
+          format: int32
+          example: 2
+        total_pages:
+          type: integer
+          description: Número total de páginas.
+          format: int32
+          example: 7
+        links:
+          type: object
+          properties:
+            self:
+              description: Enlace a la propia página devuelta.
+              allOf:
+                - $ref: '#/components/schemas/standard_paging_link'
+            previous:
+              description: Enlace a la página previa
+              allOf:
+                - $ref: '#/components/schemas/standard_paging_link'
+            next:
+              description: Enlace a la página siguiente.
+              allOf:
+                - $ref: '#/components/schemas/standard_paging_link'
+            first:
+              description: Enlace a la primera página.
+              allOf:
+                - $ref: '#/components/schemas/standard_paging_link'
+            last:
+              description: Enlace a la última página.
+              allOf:
+                - $ref: '#/components/schemas/standard_paging_link'
+      description: >
+        Modelo de objeto paginación usado en la respuesta estándar con
+        metadatos.
+
+        Incluye la información sobre paginación y se devuelve en todas las
+        respuestas paginadas.
+    standard_paging_link:
+      type: object
+      properties:
+        href:
+          type: string
+          description: Enlace codificado en html.
+          example: >-
+            https://apis.comunidad.madrid/ciencia-tecnologia/test-api/v1/resources?$init=15&amp;$limit=5
+      description: Modelo de enlace referenciado en el modelo de paginación.
+    standard_status_endpoint_system_object:
+      type: object
+      properties:
+        system:
+          type: string
+          description: Nombre del sistema probado
+          example: Database
+        status:
+          type: boolean
+          description: Estado del sistema probado
+          example: true
+      description: Modelo de objeto de sistema para el endpoint de monitorización.
+    standard_filter_value:
+      type: object
+      properties:
+        property:
+          type: string
+          description: Nombre de la propiedad (columna de BBDD)
+          example: property_1
+        prop_type:
+          type: string
+          description: Tipo de dato
+          example: STRING
+          enum:
+            - STRING
+            - INTEGER
+            - FLOAT
+            - DATE
+            - DATETIME
+            - BOOLEAN
+        prop_value:
+          type: string
+          description: Valor de la propiedad.
+          example: value_1
+        prop_values:
+          type: array
+          description: Array de valores a usar como rango
+          items:
+            type: string
+        $filter:
+          $ref: '#/components/schemas/standard_filter_object_base'
+      description: >
+        Modelo de valor de objeto de filtrado.
+
+        Consiste en un par clave-valor que indica un criterio para realizar el
+        filtrado.
+    standard_filter_object:
+      type: object
+      properties:
+        operation:
+          type: string
+          description: Operación a realizar
+          example: LT
+          enum:
+            - AND
+            - OR
+            - GT
+            - LT
+            - GTEQ
+            - LTEQ
+            - EQ
+            - NEQ
+            - IN
+            - BETWEEN
+            - SUBSTRING
+            - LIKE
+            - ILIKE
+            - NLIKE
+            - REGEXP
+        values:
+          type: array
+          items:
+            $ref: '#/components/schemas/standard_filter_value'
+      description: >
+        Modelo de objeto de filtrado.
+
+        Parámetro que indica los criterios para una consulta compleja.
+
+        Permite realizar operaciones AND, OR, mayor o igual, substring, like,
+        etc
+    standard_filter_object_base:
+      type: object
+      properties:
+        operation:
+          type: string
+          description: Operación a realizar
+          example: LT
+          enum:
+            - AND
+            - OR
+            - GT
+            - LT
+            - GTEQ
+            - LTEQ
+            - EQ
+            - NEQ
+            - IN
+            - BETWEEN
+            - SUBSTRING
+            - LIKE
+            - ILIKE
+            - NLIKE
+            - REGEXP
+        values:
+          type: array
+          items:
+            type: string
+            description: >
+              Este objeto es el mismo que se refleja en la definición de
+              standard_filter_value.
+
+              Permite concatenar valores para el filtro. Su tipo es el mismo que
+              dicho objeto,
+
+              aunque aquí esté definido como string para evitar referencias
+              circulares.
+      description: >
+        Este objeto permite anidar (concatenar) filtros para realizar consultas
+        más complejas.
+
+        Su implementación es la misma que se refleja en la definición de
+        standard_filter_object.
+    uuid:
+      maxLength: 36
+      minLength: 36
+      pattern: '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}'
+      type: string
+      description: Modelo para identificadores basados en UUID
+      format: uuid
+      example: 62977d46-7a50-41c9-8d84-38272ac2a8df
+    location_header:
+      type: string
+      description: Cabecera estándar a devolver en la creación de recursos
+      example: /clientes/62977d46-7a50-41c9-8d84-38272ac2a8df
+    api_generica:
+      required:
+        - contexto
+        - nombre
+        - usuario_creador
+        - uuid
+        - version
+      type: object
+      properties:
+        uuid:
+          $ref: '#/components/schemas/uuid'
+        nombre:
+          type: string
+          description: Nombre de la API
+          example: PINT-Interoperabilidad-Gobierno
+        descripcion:
+          maxLength: 500
+          type: string
+          description: Descripción de la API
+          example: >
+            API para ofrecer distintas utilidades del API Manager para consumo
+            interno.
+
+            Permite obtener listados de APIs, filtrarlos en función de su módulo
+            técnico, obtener sucripciones, etc.
+        contexto:
+          type: string
+          description: >-
+            Contexto de la API. Suele estar compuesto por el nombre del tenant y
+            el basePath
+          example: >-
+            /t/dacm.comunidad.madrid/md/infraestructura/interoperabilidad-gobierno
+        version:
+          type: string
+          description: Version de la API. Consta de, como máximo, una parte decimal
+          example: v1.1
+        responsable:
+          type: string
+          description: >-
+            Nombre de la persona responsable de la API. Puede contener el número
+            de teléfono
+          example: Marcos Carretero Poblete
+        usuario_creador:
+          type: string
+          description: Nombre de usuario que creó la API
+          example: USR_GOB_API@dacm.comunidad.madrid
+      description: Modelo del recurso API cuando se recupera a modo de listado
+    api_detallada:
+      required:
+        - backends
+        - definicion
+        - despliegues
+        - fecha_creacion
+      properties:
+        propiedades:
+          type: object
+          properties:
+            repositorio:
+              type: string
+              description: >-
+                Ruta de subversion donde se ubica el documento de definición de
+                la API
+              example: >-
+                https://subversion01.madrid.org:8443/svn/pint/entregas/20231111/pint_api_interoperabilidad/swagger
+            modulo_tecnico:
+              type: string
+              description: Módulo técnico de la API
+              example: PINT_API_MOCK
+            mantis:
+              type: string
+              description: Código numérico del mantis que cubre el ciclo de vida de la API
+              example: '52067'
+          description: Propiedades indicadas para una API
+        fecha_creacion:
+          type: string
+          description: Fecha de creación de la API
+          format: date-time
+          example: '2023-10-10T17:09:49.04Z'
+        fecha_actualizacion:
+          type: string
+          description: Fecha de la última actualización de la API
+          format: date-time
+          example: '2023-10-10T17:09:49.04Z'
+        suscripciones:
+          type: array
+          description: Suscripciones actuales de la API
+          items:
+            $ref: '#/components/schemas/suscripcion'
+        backends:
+          type: object
+          properties:
+            produccion:
+              type: string
+              description: URL de despliegue del backend de sandbox
+              example: http://val.mdsvlva1252:5011
+            sandbox:
+              type: string
+              description: URL de despliegue del backend de sandbox
+              example: http://des.mdsvlva1252:5011
+          description: Información sobre los backends de la API
+        definicion:
+          type: string
+          description: URL donde poder obtener la definición de la API, en formato JSON
+          example: >-
+            https://apiscmintra.val.comunidad.madrid/tec/gob-api/catalogo-apis/v1/apis/87d54131-c0f9-4997-ac93-96ba4dd90a3d/definiciones
+        despliegues:
+          type: object
+          properties:
+            interno:
+              type: string
+              description: URL de acceso a una API en el gateway interno
+              example: >-
+                https://apiscmintra.val.comunidad.madrid/t/dacm.comunidad.madrid/md/infraestructura/interoperabilidad-gobierno/v1
+            externo:
+              type: string
+              description: URL de acceso a una API en el gateway externo
+              example: >-
+                https://apiscm.val.comunidad.madrid/t/dacm.comunidad.madrid/md/infraestructura/interoperabilidad-gobierno/v1
+          description: >-
+            Despliegues de la API, tanto en el gateway interno como en el
+            externo
+      description: Modelo del recurso API cuando se recupera a modo detallado
+      allOf:
+        - $ref: '#/components/schemas/api_generica'
+    suscripcion:
+      required:
+        - aplicacion
+        - estado
+        - usuario_suscriptor
+      type: object
+      properties:
+        usuario_suscriptor:
+          type: string
+          description: Usuario creador de la aplicación suscriptora
+          example: USR_GOB_API@dacm.comunidad.madrid
+        aplicacion:
+          type: string
+          description: Nombre de la aplicación suscriptora
+          example: WSO2APP_TEST_GOBIERNO_API
+        modulo_tecnico:
+          type: string
+          description: Nombre del módulo técnico consumidor
+          example: PINT_REST_CATALOGO_APIM
+        cuota_uso:
+          type: string
+          description: Cuota de uso de la suscripción (throttling)
+          example: MDPSUS10000min
+        estado:
+          type: string
+          description: |
+            Estado de la suscripción:
+              - BLOCKED - Suscripción bloqueada
+              - ON_HOLD - Suscripción en espera de ser aprobada
+              - UNBLOCKED - Suscripción lista para usarse
+          example: UNBLOCKED
+          enum:
+            - BLOCKED
+            - ON_HOLD
+            - UNBLOCKED
+      description: Modelo del recurso suscripción para una API.
+    definicion_api_json_openapi3:
+      type: object
+      properties:
+        openapi:
+          type: string
+          description: Versión de la definición
+          example: 3.0.0
+        info:
+          type: object
+          properties:
+            version:
+              type: string
+              description: Versión de la API
+              example: v1
+            title:
+              type: string
+              description: Nombre de la API
+              example: Catalogo-Apis
+            description:
+              type: string
+              description: Descripción de la API
+              example: Descripción de la API
+            contact:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: Nombre del responsable de la API
+                  example: Marcos Carretero Poblete
+                email:
+                  type: string
+                  description: Correo electrónico del responsable de la API
+                  example: marcos.carretero@cloudappi.net
+              description: >-
+                Información de contacto de los responsables o desarrolladores de
+                la API
+          description: Información general de la API
+        servers:
+          type: array
+          description: Listado de despliegues donde se puede consumir la API
+          items:
+            type: object
+            properties:
+              url:
+                type: string
+                description: URL de acceso a la API
+                example: >-
+                  https://apiscmintra.val.comunidad.madrid/tec/gob-api/catalogo-apis/v1
+              description:
+                type: string
+                description: Descripción de la URL de acceso a la API'
+                example: URL de la API en el entorno de Validación para el tenant Super
+        tags:
+          type: array
+          description: Etiquetas de la API
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+                description: Nombre de la etiqueta
+                example: monitorización
+              description:
+                type: string
+                description: Descripción de la etiqueta
+                example: Etiqueta a aplicar al endpoint /status
+        paths:
+          type: object
+          properties:
+            /status:
+              type: object
+              properties:
+                get:
+                  type: object
+                  properties:
+                    summary:
+                      type: string
+                      description: Resumen del endpoint
+                      example: Endpoint de monitorización de la API
+                    description:
+                      type: string
+                      description: Descripción del endpoint
+                      example: >-
+                        Propuesta de definición de la respuesta que debería
+                        ofrecer el endpoint de monitorización previsto en el
+                        estándar.
+                    tags:
+                      type: array
+                      description: Array de etiquetas que aplican a este endpoint
+                      items:
+                        type: string
+                        example: monitorización
+                    responses:
+                      type: object
+                      properties:
+                        '200':
+                          type: object
+                          properties:
+                            referencia:
+                              type: string
+                              description: >-
+                                Referencia a un modelo de la misma definición.
+                                Se omite la partícula '$ref', pero realmente
+                                sería ésa la que debería usarse
+                              example: >-
+                                #/components/responses/standard_status_endpoint_response
+                            examples:
+                              type: object
+                              properties:
+                                application/json:
+                                  type: object
+                                  properties:
+                                    propiedad_ejemplo_respuesta:
+                                      type: string
+                                      description: >-
+                                        Aquí irían todas las propiedades
+                                        posibles del ejemplo de respuesta
+                                      example: >-
+                                        Esto es solo un ejemplo de propiedad de
+                                        respuesta
+                                  description: Respuesta con mimetype application/json
+                              description: >-
+                                Ejemplos de respuesta para el código de estado
+                                al que aplica. Se separa en Mimetypes
+                          description: Respuesta con código de estado 200 para el endpoint
+                        default:
+                          type: object
+                          properties:
+                            referencia:
+                              type: string
+                              description: >-
+                                Referencia a un modelo de la misma definición.
+                                Se omite la partícula '$ref', pero realmente
+                                sería ésa la que debería usarse
+                              example: >-
+                                #/components/responses/standard_server_error_response
+                          description: Respuesta por defecto para el endpoint
+                      description: >-
+                        Todas las respuestas posibles para el endpoint al que
+                        aplica. Se nombran según el código de estado. Pueden
+                        referenciar modelos.
+                  description: >-
+                    Método HTTP para el path al que pertenece. Puede ser get,
+                    post, put o delete
+              description: >-
+                Path de ejemplo. El nombre de esta propiedad varía en función de
+                cada API
+          description: Nombre de todos los paths con los que cuenta esta API'
+        components:
+          type: object
+          properties:
+            parameters:
+              type: object
+              properties:
+                id_usuario:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                      description: Nombre del parámetro
+                      example: id_usuario
+                    in:
+                      type: string
+                      description: Lugar donde se encuentra el parámetros
+                      enum:
+                        - query
+                        - path
+                        - header
+                    type:
+                      type: string
+                      description: Tipo de dato del parámetro
+                      example: string
+                    description:
+                      type: string
+                      description: Descripción del parámetro
+                      example: Identificador del usuario
+                  description: Parámetro de ejemplo de la API
+              description: >-
+                Subapartado de la definición donde se encuentran todos los
+                parámetros de la API'
+            requestBodies:
+              type: object
+              properties:
+                usuario_body_request:
+                  type: object
+                  properties:
+                    referencia:
+                      type: string
+                      description: >-
+                        Referencia a un modelo de la misma definición. Se omite
+                        la partícula '$ref', pero realmente sería ésa la que
+                        debería usarse
+                      example: '#/components/schemas/usuario'
+                    description:
+                      type: string
+                      description: Descripción del modelo
+                      example: >-
+                        Respuesta estándar cuando un recurso devuelve un solo
+                        elemento
+                    type:
+                      type: string
+                      description: Tipo de dato que conforma el modelo
+                      example: object
+                    required:
+                      type: array
+                      description: >-
+                        Array de propiedades requeridas para el modelo al que
+                        aplica
+                      items:
+                        type: string
+                        example: identificador
+                  description: Cuerpo de petición de ejemplo para una API
+              description: >-
+                Subapartado de la definición donde se encuentran todos los
+                cuerpos de petición de la API
+            schemas:
+              type: object
+              properties:
+                standard_response:
+                  type: object
+                  properties:
+                    referencia:
+                      type: string
+                      description: >-
+                        Referencia a un modelo de la misma definición. Se omite
+                        la partícula '$ref', pero realmente sería ésa la que
+                        debería usarse
+                      example: '#/components/schemas/standard_response_result'
+                    description:
+                      type: string
+                      description: Descripción del modelo
+                      example: >-
+                        Respuesta estándar cuando un recurso devuelve un solo
+                        elemento
+                    type:
+                      type: string
+                      description: Tipo de dato que conforma el modelo
+                      example: object
+                    required:
+                      type: array
+                      description: >-
+                        Array de propiedades requeridas para el modelo al que
+                        aplica
+                      items:
+                        type: string
+                        example: result
+                  description: Modelo de ejemplo para una API
+              description: >-
+                Subapartado de la definición donde se encuentran todos los
+                esquemas de la API
+            responses:
+              type: object
+              properties:
+                standard_server_error_response:
+                  type: object
+                  properties:
+                    description:
+                      type: string
+                      description: Descripción de la respuesta
+                      example: Error desconocido
+                    headers:
+                      type: object
+                      properties:
+                        x-trace-id:
+                          type: object
+                          properties:
+                            type:
+                              type: string
+                              description: Tipo de dato que contiene la cabecera
+                              example: string
+                          description: Ejemplo de cabecera para una respuesta
+                      description: Cabeceras que acompañan a la respuesta
+                    content:
+                      type: object
+                      properties:
+                        application/json:
+                          type: object
+                          properties:
+                            schema:
+                              type: object
+                              properties:
+                                referencia:
+                                  type: string
+                                  description: >-
+                                    Referencia a un modelo de la misma
+                                    definición. Se omite la partícula '$ref',
+                                    pero realmente sería ésa la que debería
+                                    usarse
+                                  example: '#/components/schemas/standard_response'
+                              description: Modelo de la respuesta
+                            example:
+                              type: object
+                              properties:
+                                referencia:
+                                  type: string
+                                  description: >-
+                                    Referencia a un modelo de la misma
+                                    definición. Se omite la partícula '$ref',
+                                    pero realmente sería ésa la que debería
+                                    usarse
+                                  example: '#/components/examples/standard_response'
+                              description: >-
+                                Ejemplo de la respuesta para un determinado
+                                mimetype
+                          description: >-
+                            Contenido de la respuesta para el mimetype
+                            application/json
+                      description: Contenido de la respuesta
+                  description: Respuesta de ejemplo para una API
+              description: >-
+                Subapartado de la definición donde se encuentran todas las
+                respuestas de la API
+            examples:
+              type: object
+              properties:
+                standard_status_endpoint_response_example:
+                  type: object
+                  properties:
+                    value:
+                      type: object
+                      properties:
+                        result:
+                          type: string
+                          description: Ejemplo de propiedad dentro del modelo
+                          example: Solicitud realizada con éxito
+                      description: Contenido del propio ejemplo
+                  description: Ejemplo de arbitrario para una API'
+              description: >-
+                Subapartado de la definición donde se encuentran todos los
+                ejemplos de modelos de la API
+          description: Apartado donde definir todos los modelos de la API'
+      description: Modelo de definición JSON para una API estándar Swagger 2
+    definicion_api_json_swagger2:
+      type: object
+      properties:
+        swagger:
+          type: string
+          description: Versión de la definición
+          example: '2.0'
+        info:
+          type: object
+          properties:
+            version:
+              type: string
+              description: Versión de la API
+              example: v1
+            title:
+              type: string
+              description: Nombre de la API
+              example: Catalogo-Apis
+            description:
+              type: string
+              description: Descripción de la API
+              example: Descripción de la API
+            contact:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: Nombre del responsable de la API
+                  example: Marcos Carretero Poblete
+                email:
+                  type: string
+                  description: Correo electrónico del responsable de la API
+                  example: marcos.carretero@cloudappi.net
+              description: >-
+                Información de contacto de los responsables o desarrolladores de
+                la API
+          description: Información general de la API
+        host:
+          type: string
+          description: Host de la máquina donde está publicada la API
+          example: apiscmintra.val.comunidad.madrid
+        basePath:
+          type: string
+          description: Base path donde está publicada la API
+          example: /tec/gob-api/catalogo-apis
+        schemes:
+          type: array
+          description: Protocolos permitidos a la hora de acceder a esta API
+          items:
+            type: string
+            example: https
+        consumes:
+          type: array
+          description: Mimetypes de entrada permitidos por la API
+          items:
+            type: string
+            example: application/json
+        produces:
+          type: array
+          description: Mimetypes que puede generar esta API
+          items:
+            type: string
+            example: application/json
+        tags:
+          type: array
+          description: Etiquetas de la API
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+                description: Nombre de la etiqueta
+                example: monitorización
+              description:
+                type: string
+                description: Descripción de la etiqueta
+                example: Etiqueta a aplicar al endpoint /status
+        paths:
+          type: object
+          properties:
+            /status:
+              type: object
+              properties:
+                get:
+                  type: object
+                  properties:
+                    summary:
+                      type: string
+                      description: Resumen del endpoint
+                      example: Endpoint de monitorización de la API
+                    description:
+                      type: string
+                      description: Descripción del endpoint
+                      example: >-
+                        Propuesta de definición de la respuesta que debería
+                        ofrecer el endpoint de monitorización previsto en el
+                        estándar.
+                    tags:
+                      type: array
+                      description: Array de etiquetas que aplican a este endpoint
+                      items:
+                        type: string
+                        example: monitorización
+                    responses:
+                      type: object
+                      properties:
+                        '200':
+                          type: object
+                          properties:
+                            description:
+                              type: string
+                              description: Descripción de la respuesta con código 200
+                              example: Estado correcto de la aplicación
+                            schema:
+                              type: object
+                              properties:
+                                referencia:
+                                  type: string
+                                  description: >-
+                                    Referencia a un modelo de la misma
+                                    definición. Se omite la partícula '$ref',
+                                    pero realmente sería ésa la que debería
+                                    usarse
+                                  example: >-
+                                    #/definitions/standard_status_endpoint_response
+                              description: >-
+                                Modelo de respuesta con código 200. Puede
+                                constar de una referencia
+                            examples:
+                              type: object
+                              properties:
+                                application/json:
+                                  type: object
+                                  properties:
+                                    propiedad_ejemplo_respuesta:
+                                      type: string
+                                      description: >-
+                                        Aquí irían todas las propiedades
+                                        posibles del ejemplo de respuesta
+                                      example: >-
+                                        Esto es solo un ejemplo de propiedad de
+                                        respuesta
+                                  description: Respuesta con mimetype application/json
+                              description: >-
+                                Ejemplos de respuesta para el código de estado
+                                al que aplica. Se separa en Mimetypes
+                          description: Respuesta con código de estado 200 para el endpoint
+                        default:
+                          type: object
+                          properties:
+                            referencia:
+                              type: string
+                              description: >-
+                                Referencia a un modelo de la misma definición.
+                                Se omite la partícula '$ref', pero realmente
+                                sería ésa la que debería usarse
+                              example: '#/responses/standard_server_error_response'
+                          description: Respuesta por defecto para el endpoint
+                      description: >-
+                        Todas las respuestas posibles para el endpoint al que
+                        aplica. Se nombran según el código de estado. Pueden
+                        referenciar modelos.
+                  description: >-
+                    Método HTTP para el path al que pertenece. Puede ser get,
+                    post, put o delete
+              description: >-
+                Path de ejemplo. El nombre de esta propiedad varía en función de
+                cada API
+          description: Nombre de todos los paths con los que cuenta esta API'
+        definitions:
+          type: object
+          properties:
+            standard_response_result:
+              type: object
+              properties:
+                properties:
+                  type: object
+                  properties:
+                    result:
+                      type: string
+                      description: Resultado de una respuesta. Este modelo es de ejemplo
+                      example: Resultado de éxito o error de la operación
+                  description: Propiedades del objeto de este modelo de ejemplo
+                required:
+                  type: array
+                  description: Array de propiedades requeridas para el modelo al que aplica
+                  items:
+                    type: string
+                    example: result
+              description: Modelo de ejemplo para una API
+          description: >-
+            Apartado de la definición donde se encuentran todos los modelos de
+            la API
+        parameters:
+          type: object
+          properties:
+            id_usuario:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: Nombre del parámetro
+                  example: id_usuario
+                in:
+                  type: string
+                  description: Lugar donde se encuentra el parámetros
+                  enum:
+                    - query
+                    - path
+                    - body
+                    - header
+                type:
+                  type: string
+                  description: Tipo de dato del parámetro
+                  example: string
+                description:
+                  type: string
+                  description: Descripción del parámetro
+                  example: Identificador del usuario
+              description: Parámetro de ejemplo de la API
+          description: >-
+            Apartado de la definición donde se encuentran todos los parámetros o
+            cuerpos de entrada de la API'
+        responses:
+          type: object
+          properties:
+            standard_server_error_response:
+              type: object
+              properties:
+                descripcion:
+                  type: string
+                  description: Descripción de la respuesta
+                  example: Default error response
+                schema:
+                  type: object
+                  properties:
+                    referencia:
+                      type: string
+                      description: >-
+                        Referencia a un modelo de la misma definición. Se omite
+                        la partícula '$ref', pero realmente sería ésa la que
+                        debería usarse
+                      example: '#/definitions/standard_response'
+                  description: Modelo de la respuesta. Puede ser una referencia
+                examples:
+                  type: object
+                  properties:
+                    application/json:
+                      type: object
+                      properties:
+                        result:
+                          type: string
+                          description: >-
+                            Propiedad de ejemplo para la respuesta. Puede ser
+                            cualquiera
+                          example: Error desconocido
+                      description: Ejemplo para el mimetype application/json
+                  description: Ejemplos de la respuesta, uno por cada mimetype posible
+              description: Respuesta de ejemplo para una API
+          description: >-
+            Apartado de la definición donde se encuentran las respuestas
+            estándar de la API
+      description: Modelo de definición JSON para una API estándar OpenAPI 3
+  responses:
+    standard_delete_response:
+      description: Recurso eliminado correctamente
+      headers:
+        x-trace-id:
+          style: simple
+          explode: false
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '#/components/schemas/standard_response'
+              - properties:
+                  data:
+                    type: object
+                    properties:
+                      uuid:
+                        type: string
+                        description: UUID del recurso eliminado
+                        format: uuid
+                        example: 497faaf6-5aab-425b-bb6d-a8e374c6ec98
+                      id:
+                        type: integer
+                        description: Identificador del recurso eliminado
+                        format: int32
+                        example: 23
+          examples:
+            Ejemplo 1:
+              $ref: '#/components/examples/standard_delete_response_example'
+    standard_multi_delete_response:
+      description: Recursos borrados correctamente
+      headers:
+        x-trace-id:
+          style: simple
+          explode: false
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            properties:
+              data:
+                type: object
+                properties:
+                  deleted_elements:
+                    type: array
+                    description: Array de identificadores de recursos eliminados
+                    example:
+                      - 497faaf6-5aab-425b-bb6d-a8e374c6ec98
+                      - 5e1dd3b1-e524-43f4-beef-46b0795ebb4f
+                    items:
+                      type: string
+            allOf:
+              - $ref: '#/components/schemas/standard_response'
+          examples:
+            Ejemplo 1:
+              $ref: '#/components/examples/standard_multi_delete_response_example'
+    standard_bad_request_response:
+      description: Petición incorrecta
+      headers:
+        x-trace-id:
+          style: simple
+          explode: false
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/standard_response'
+          example:
+            result:
+              status: false
+              http_code: 400
+              info: Parámetros incorrectos
+              trace_id: 123456abcde
+              errors:
+                - code: 1000
+                  message: El atributo '%s' no puede contener un valor nulo
+                - code: 1005
+                  message: >-
+                    El contenido del atributo '%s' ha de seguir el formato ISO
+                    8601 para fechas sin hora
+    standard_unauthorized_response:
+      description: No autorizado
+      headers:
+        x-trace-id:
+          style: simple
+          explode: false
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/standard_response'
+          example:
+            result:
+              status: false
+              http_code: 401
+              info: No autorizado
+              trace_id: 123456abcde
+    standard_forbidden_response:
+      description: Recurso prohibido
+      headers:
+        x-trace-id:
+          style: simple
+          explode: false
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/standard_response'
+          example:
+            result:
+              status: false
+              http_code: 403
+              info: Recurso prohibido
+              trace_id: 123456abcde
+    standard_not_found_response:
+      description: No encontrado
+      headers:
+        x-trace-id:
+          style: simple
+          explode: false
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/standard_response'
+          example:
+            result:
+              status: false
+              http_code: 404
+              info: Recurso no encontrado
+              trace_id: 123456abcde
+              errors:
+                - code: 1104
+                  message: >-
+                    No se ha encontrado ningún elemento con el identificador
+                    proporcionado. Por favor, revise: %s
+    standard_too_many_requests_response:
+      description: Demasiadas peticiones
+      headers:
+        x-trace-id:
+          style: simple
+          explode: false
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/standard_response'
+          example:
+            result:
+              status: false
+              http_code: 429
+              info: Cuota de peticiones excedida
+              trace_id: 123456abcde
+    standard_server_error_response:
+      description: Error desconocido
+      headers:
+        x-trace-id:
+          style: simple
+          explode: false
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/standard_response'
+          example:
+            result:
+              status: false
+              http_code: 500
+              info: Error desconocido
+              trace_id: 123456abcde
+              errors:
+                - code: 2000
+                  message: Mensaje de error
+    standard_status_endpoint_response:
+      description: Status
+      headers:
+        x-trace-id:
+          style: simple
+          explode: false
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            properties:
+              data:
+                type: object
+                properties:
+                  current_date_time:
+                    type: string
+                    description: >-
+                      Fecha actual del servidor. Se usa para comprobar si el
+                      recurso se cachea
+                    format: date-time
+                  app_version:
+                    type: string
+                    description: Versión y nombre de la aplicación
+                    example: 1.2.0 pint_rest_catalogo_apis
+                  app_build_date_time:
+                    type: string
+                    description: Fecha de compilación de la aplicacion (del jar)
+                    format: date-time
+                  frw_version:
+                    type: string
+                    description: Versión del framework usado
+                    example: JAPI 1.2.0
+                  systems:
+                    type: array
+                    description: Array de sistemas comprobados y resultados.
+                    items:
+                      $ref: >-
+                        #/components/schemas/standard_status_endpoint_system_object
+                description: >-
+                  Comprobaciones realizadas cuando se recibe la llamada al
+                  endpoint de status
+            allOf:
+              - $ref: '#/components/schemas/standard_response'
+          examples:
+            Ejemplo 1:
+              $ref: '#/components/examples/standard_status_endpoint_response_example'
+    apis_response:
+      description: Listado de APIs obtenido correctamente
+      headers:
+        x-trace-id:
+          style: simple
+          explode: false
+          schema:
+            $ref: '#/components/schemas/uuid'
+      content:
+        application/json:
+          schema:
+            properties:
+              data:
+                type: object
+                properties:
+                  apis:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/api_generica'
+            allOf:
+              - $ref: '#/components/schemas/standard_response_with_metadata'
+          examples:
+            Ejemplo 1:
+              $ref: '#/components/examples/apis_response_example'
+    lista_apis_response:
+      description: Listado de APIs obtenido correctamente
+      headers:
+        x-trace-id:
+          style: simple
+          explode: false
+          schema:
+            $ref: '#/components/schemas/uuid'
+      content:
+        application/json:
+          schema:
+            properties:
+              data:
+                type: object
+                properties:
+                  apis:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/api_generica'
+            allOf:
+              - $ref: '#/components/schemas/standard_response_with_metadata'
+          examples:
+            Ejemplo 1:
+              $ref: '#/components/examples/lista_apis_response_example'
+    lista_productos_response:
+      description: Listado de productos obtenido correctamente
+      headers:
+        x-trace-id:
+          style: simple
+          explode: false
+          schema:
+            $ref: '#/components/schemas/uuid'
+      content:
+        application/json:
+          schema:
+            properties:
+              data:
+                type: object
+                properties:
+                  productos:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/api_generica'
+            allOf:
+              - $ref: '#/components/schemas/standard_response_with_metadata'
+          examples:
+            Ejemplo 1:
+              $ref: '#/components/examples/lista_productos_response_example'
+    productos_response:
+      description: Listado de productos obtenido correctamente
+      headers:
+        x-trace-id:
+          style: simple
+          explode: false
+          schema:
+            $ref: '#/components/schemas/uuid'
+      content:
+        application/json:
+          schema:
+            properties:
+              data:
+                type: object
+                properties:
+                  productos:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/api_generica'
+            allOf:
+              - $ref: '#/components/schemas/standard_response_with_metadata'
+          examples:
+            Ejemplo 1:
+              $ref: '#/components/examples/productos_response_example'
+    api_response:
+      description: Detalle de la API obtenido correctamente
+      headers:
+        x-trace-id:
+          style: simple
+          explode: false
+          schema:
+            $ref: '#/components/schemas/uuid'
+      content:
+        application/json:
+          schema:
+            properties:
+              data:
+                $ref: '#/components/schemas/api_detallada'
+            allOf:
+              - $ref: '#/components/schemas/standard_response'
+          examples:
+            Ejemplo 1:
+              $ref: '#/components/examples/api_response_example'
+    definicion_api_response:
+      description: Definición de la API obtenida correctamente
+      headers:
+        x-trace-id:
+          style: simple
+          explode: false
+          schema:
+            $ref: '#/components/schemas/uuid'
+      content:
+        application/json:
+          schema:
+            oneOf:
+              - $ref: '#/components/schemas/definicion_api_json_swagger2'
+              - $ref: '#/components/schemas/definicion_api_json_openapi3'
+          examples:
+            Ejemplo Swagger 2:
+              $ref: '#/components/examples/definicion_api_swagger2_response_example'
+            Ejemplo OpenAPI 3:
+              $ref: '#/components/examples/definicion_api_openapi3_response_example'
+    suscripciones_response:
+      description: Listado de suscripciones de la API obtenido correctamente
+      headers:
+        x-trace-id:
+          style: simple
+          explode: false
+          schema:
+            $ref: '#/components/schemas/uuid'
+      content:
+        application/json:
+          schema:
+            properties:
+              data:
+                type: object
+                properties:
+                  suscripciones:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/suscripcion'
+            allOf:
+              - $ref: '#/components/schemas/standard_response_with_metadata'
+          examples:
+            Ejemplo 1:
+              $ref: '#/components/examples/suscripciones_response_example'
+  parameters:
+    standard_init_param:
+      name: $init
+      in: query
+      description: |
+        Registro inicial deseado
+        * Valor mínimo: 0
+        * Valor máximo: Número total de registros
+      required: false
+      style: form
+      explode: true
+      schema:
+        minimum: 0
+        type: integer
+        format: int32
+        default: 0
+      example: 0
+    standard_limit_param:
+      name: $limit
+      in: query
+      description: |
+        Número máximo de registros a mostrar por página
+        * Valor mínimo: 1
+      required: false
+      style: form
+      explode: true
+      schema:
+        minimum: 1
+        type: integer
+        format: int32
+        default: 25
+      example: 25
+    standard_total_param:
+      name: $total
+      in: query
+      description: >
+        Indica si se deben calcular y devolver los atributos _total_ y
+        _total_pages_ en el objeto _metadata.paging_ de la respuesta estándar.
+      required: false
+      style: form
+      explode: true
+      schema:
+        type: boolean
+        default: false
+      example: true
+    standard_select_param:
+      name: $select
+      in: query
+      description: >
+        Permite seleccionar los atributos del recurso que se desean obtener en
+        la consulta.
+
+        Se recomienda su uso cuando sólo se desea obtener unos pocos atributos
+        de un recurso complejo.
+
+        Puede especificarse como un array de atributos. Ver estándar de
+        definición de APIs.
+      required: false
+      style: form
+      explode: true
+      schema:
+        maxItems: 100
+        minItems: 1
+        type: array
+        items:
+          type: string
+      example:
+        - id
+        - nombre
+        - tipo
+    standard_exclude_param:
+      name: $exclude
+      in: query
+      description: >
+        Permite excluir determinados atributos del recurso.
+
+        Se recomienda su uso cuando se desea excluir algunos atributos de un
+        recurso complejo.
+
+        Puede especificarse como un array de atributos. Ver estándar de
+        definición de APIs.
+      required: false
+      style: form
+      explode: true
+      schema:
+        maxItems: 100
+        minItems: 1
+        type: array
+        items:
+          type: string
+      example:
+        - id
+        - tipo
+    standard_expand_param:
+      name: $expand
+      in: query
+      description: >
+        Indica una lista de subatributos que se desea expandir.
+
+        Puede especificarse como un array de atributos. Ver estándar de
+        definición de APIs.
+      required: false
+      style: form
+      explode: true
+      schema:
+        maxItems: 100
+        minItems: 1
+        type: array
+        items:
+          type: string
+      example:
+        - subcategoria
+        - nombre_tipo
+    standard_order_by_param:
+      name: $orderby
+      in: query
+      description: >
+        Permite indicar los criterios de ordenación de una consulta.
+
+        El formato a utilizar será un signo + ó - para indicar si es
+
+        ascendente o descendente seguido del nombre de la columna o campo por el
+        que se ordena.
+      required: false
+      style: form
+      explode: true
+      schema:
+        maxItems: 100
+        minItems: 1
+        type: array
+        items:
+          type: string
+      example:
+        - '-date'
+    standard_trace_id_header_param:
+      name: x-trace-id
+      in: header
+      description: |
+        Cabecera indicando el id de traceo de la petición.
+        Debe ser una cadena aleatoria basada en timestamp.
+      required: true
+      style: simple
+      explode: false
+      schema:
+        maxLength: 100
+        type: string
+      examples:
+        Ejemplo 1:
+          value: 12345abcde
+    uuid_api_param:
+      name: uuid_api
+      in: path
+      description: UUID de la API a obtener
+      required: true
+      style: simple
+      explode: false
+      schema:
+        $ref: '#/components/schemas/uuid'
+      examples:
+        Ejemplo 1:
+          value: 62977d46-7a50-41c9-8d84-38272ac2a8df
+    modulo_tecnico_param:
+      name: modulo_tecnico
+      in: path
+      description: >-
+        Módulo técnico del que obtener la información. Debe ir siempre en
+        mayúsculas.
+      required: true
+      style: simple
+      explode: false
+      schema:
+        type: string
+        example: PINT_API_MOCK
+      examples:
+        Ejemplo 1:
+          value: PINT_API_MOCK
+  examples:
+    standard_delete_response_example:
+      value:
+        result:
+          status: true
+          http_code: 200
+          info: Solicitud realizada con éxito
+          trace_id: 123456abcde
+        data:
+          uuid: 5e1dd3b1-e524-43f4-beef-46b0795ebb4f
+    standard_multi_delete_response_example:
+      value:
+        result:
+          status: true
+          http_code: 200
+          info: Solicitud realizada con éxito
+          trace_id: 123456abcde
+        data:
+          deleted_elements:
+            - 5e1dd3b1-e524-43f4-beef-46b0795ebb4f
+            - 4e35b5ab-7d96-4aa8-88cf-1c6e77059766
+            - 59909623-0b85-46e2-a5f4-ca81e81e3464
+    standard_status_endpoint_response_example:
+      value:
+        result:
+          status: true
+          http_code: 200
+          info: Solicitud realizada con éxito
+          trace_id: 12345abcde
+        data:
+          current_date_time: 2022-05-11T13:44:33+0200
+          app_version: 1.2.0 pint_rest_catalogo_apis
+          app_build_date_time: 2022-05-03T18:22:24+0200
+          frw_version: JAPI 1.2.0
+          systems:
+            - system: BBDD
+              status: true
+            - system: JWKS de WSO2
+              status: true
+    api_response_example:
+      value:
+        result:
+          status: true
+          http_code: 200
+          info: API recuperada con éxito
+          trace_id: dc87d7a0-ec39-48bb-842b-60186005e595
+        data:
+          uuid: 62977d46-7a50-41c9-8d84-38272ac2a8df
+          nombre: PINT-Interoperabilidad-Gobierno
+          descripcion: >-
+            API para ofrecer distintas utilidades del API Manager para consumo
+            interno.\nPermite obtener listados de APIs, filtrarlos en función de
+            su módulo técnico, obtener sucripciones, etc.
+          contexto: >-
+            /t/dacm.comunidad.madrid/md/infraestructura/interoperabilidad-gobierno
+          version: v1
+          informacion_contacto:
+            owner:
+              nombre: Marcos Carretero Poblete
+              correo: marcos.carretero@cloudappi.net
+            desarrollador:
+              nombre: Marcos Carretero Poblete
+              correo: marcos.carretero@cloudappi.net
+          usuario_creador: USR_GOB_API@dacm.comunidad.madrid
+          propiedades:
+            repositorio: >-
+              https://subversion01.madrid.org:8443/svn/pint/entregas/20231111/pint_api_interoperabilidad/swagger
+            modulo_tecnico: PINT_API_MOCK
+            mantis: '52967'
+          fecha_creacion: '2023-10-10T17:09:49.040Z'
+          fecha_actualizacion: '2023-10-10T17:09:49.040Z'
+          suscripciones:
+            - usuario_suscriptor: USR_GOB_API@dacm.comunidad.madrid
+              aplicacion: WSO2APP_TEST_GOBIERNO_API
+              modulo_tecnico: PINT_REST_CATALOGO_APIM
+              cuota_uso: MDPSUS10000min
+              estado: UNBLOCKED
+          backends:
+            produccion: http://val.mdsvlva1252:5011
+            sandbox: http://des.mdsvlva1252:5011
+          definicion: >-
+            https://apiscmintra.val.comunidad.madrid/tec/gob-api/catalogo-apis/v1/apis/87d54131-c0f9-4997-ac93-96ba4dd90a3d/definiciones
+          despliegues:
+            interno: >-
+              https://apiscmintra.val.comunidad.madrid/t/dacm.comunidad.madrid/md/infraestructura/interoperabilidad-gobierno/v1
+            externo: >-
+              https://apiscm.val.comunidad.madrid/t/dacm.comunidad.madrid/md/infraestructura/interoperabilidad-gobierno/v1
+    apis_response_example:
+      value:
+        result:
+          status: true
+          http_code: 206
+          info: Listado de APIs recuperado exitosamente
+          trace_id: dc87d7a0-ec39-48bb-842b-60186005e595
+        metadata:
+          paging:
+            init: 15
+            limit: 5
+            num_page: 3
+            total: 35
+            total_pages: 7
+            links:
+              self:
+                href: /modulos-tecnicos/{modulo_tecnico}/apis?$init=15&amp;$limit=5
+              previous:
+                href: /modulos-tecnicos/{modulo_tecnico}/apis?$init=10&amp;$limit=5
+              next:
+                href: /modulos-tecnicos/{modulo_tecnico}/apis?$init=20&amp;$limit=5
+              first:
+                href: /modulos-tecnicos/{modulo_tecnico}/apis?$init=0&amp;$limit=5
+              last:
+                href: /modulos-tecnicos/{modulo_tecnico}/apis?$init=30&amp;$limit=5
+        data:
+          apis:
+            - uuid: 59909623-0b85-46e2-a5f4-ca81e81e3464
+              nombre: PINT-Interoperabilidad-Gobierno
+              descripcion: >-
+                API para ofrecer distintas utilidades del API Manager para
+                consumo interno.\nPermite obtener listados de APIs, filtrarlos
+                en función de su módulo técnico, obtener sucripciones, etc.\n
+              contexto: >-
+                /t/dacm.comunidad.madrid/md/infraestructura/interoperabilidad-gobierno
+              version: v1
+              responsable: Marcos Carretero Poblete
+              usuario_creador: USR_GOB_API@dacm.comunidad.madrid
+            - uuid: ba3192f5-7ddf-4fdd-ac4e-97c206a13018
+              nombre: PINT-Interoperabilidad-Gobierno
+              descripcion: >-
+                API para ofrecer distintas utilidades del API Manager para
+                consumo interno.\nPermite obtener listados de APIs, filtrarlos
+                en función de su módulo técnico, obtener sucripciones, etc.\n
+              contexto: >-
+                /t/dacm.comunidad.madrid/md/infraestructura/interoperabilidad-gobierno
+              version: v1.1
+              responsable: Marcos Carretero Poblete
+              usuario_creador: USR_GOB_API@dacm.comunidad.madrid
+    lista_apis_response_example:
+      value:
+        result:
+          status: true
+          http_code: 206
+          info: Listado de APIs recuperado exitosamente
+          trace_id: dc87d7a0-ec39-48bb-842b-60186005e595
+        metadata:
+          paging:
+            init: 15
+            limit: 5
+            num_page: 3
+            total: 35
+            total_pages: 7
+            links:
+              self:
+                href: /apis?$init=15&amp;$limit=5
+              previous:
+                href: /apis?$init=10&amp;$limit=5
+              next:
+                href: /apis?$init=20&amp;$limit=5
+              first:
+                href: /apis?$init=0&amp;$limit=5
+              last:
+                href: /apis?$init=30&amp;$limit=5
+        data:
+          apis:
+            - uuid: 59909623-0b85-46e2-a5f4-ca81e81e3464
+              nombre: PINT-Interoperabilidad-Gobierno
+              descripcion: >-
+                API para ofrecer distintas utilidades del API Manager para
+                consumo interno.\nPermite obtener listados de APIs, filtrarlos
+                en función de su módulo técnico, obtener sucripciones, etc.\n
+              contexto: >-
+                /t/dacm.comunidad.madrid/md/infraestructura/interoperabilidad-gobierno
+              version: v1
+              responsable: Marcos Carretero Poblete
+              usuario_creador: USR_GOB_API@dacm.comunidad.madrid
+            - uuid: ba3192f5-7ddf-4fdd-ac4e-97c206a13018
+              nombre: PINT-Interoperabilidad-Gobierno
+              descripcion: >-
+                API para ofrecer distintas utilidades del API Manager para
+                consumo interno.\nPermite obtener listados de APIs, filtrarlos
+                en función de su módulo técnico, obtener sucripciones, etc.\n
+              contexto: >-
+                /t/dacm.comunidad.madrid/md/infraestructura/interoperabilidad-gobierno
+              version: v1.1
+              responsable: Marcos Carretero Poblete
+              usuario_creador: USR_GOB_API@dacm.comunidad.madrid
+    productos_response_example:
+      value:
+        result:
+          status: true
+          http_code: 206
+          info: Listado de productos recuperado exitosamente
+          trace_id: dc87d7a0-ec39-48bb-842b-60186005e595
+        metadata:
+          paging:
+            init: 15
+            limit: 5
+            num_page: 3
+            total: 35
+            total_pages: 7
+            links:
+              self:
+                href: >-
+                  /modulos-tecnicos/{modulo_tecnico}/productos?$init=15&amp;$limit=5
+              previous:
+                href: >-
+                  /modulos-tecnicos/{modulo_tecnico}/productos?$init=10&amp;$limit=5
+              next:
+                href: >-
+                  /modulos-tecnicos/{modulo_tecnico}/productos?$init=20&amp;$limit=5
+              first:
+                href: >-
+                  /modulos-tecnicos/{modulo_tecnico}/productos?$init=0&amp;$limit=5
+              last:
+                href: >-
+                  /modulos-tecnicos/{modulo_tecnico}/productos?$init=30&amp;$limit=5
+        data:
+          productos:
+            - uuid: 59909623-0b85-46e2-a5f4-ca81e81e3464
+              nombre: PINT-Interoperabilidad-Gobierno
+              descripcion: >-
+                Producto para ofrecer distintas utilidades del API Manager para
+                consumo interno.\nPermite obtener listados de productos,
+                filtrarlos en función de su módulo técnico, obtener
+                sucripciones, etc.\n
+              contexto: /pdto/interoperabilidad-gobierno
+              version: 1.0.0
+              responsable: Marcos Carretero Poblete
+              usuario_creador: USR_GOB_API@dacm.comunidad.madrid
+            - uuid: ba3192f5-7ddf-4fdd-ac4e-97c206a13018
+              nombre: PINT-Interoperabilidad-Gobierno
+              descripcion: >-
+                Producto para ofrecer distintas utilidades del API Manager para
+                consumo interno.\nPermite obtener listados de productos,
+                filtrarlos en función de su módulo técnico, obtener
+                sucripciones, etc.\n
+              contexto: /pdto/interoperabilidad-gobierno
+              version: 1.0.1
+              responsable: Marcos Carretero Poblete
+              usuario_creador: USR_GOB_API@dacm.comunidad.madrid
+    lista_productos_response_example:
+      value:
+        result:
+          status: true
+          http_code: 206
+          info: Listado de productos recuperado exitosamente
+          trace_id: dc87d7a0-ec39-48bb-842b-60186005e595
+        metadata:
+          paging:
+            init: 15
+            limit: 5
+            num_page: 3
+            total: 35
+            total_pages: 7
+            links:
+              self:
+                href: /productos?$init=15&amp;$limit=5
+              previous:
+                href: /productos?$init=10&amp;$limit=5
+              next:
+                href: /productos?$init=20&amp;$limit=5
+              first:
+                href: /productos?$init=0&amp;$limit=5
+              last:
+                href: /productos?$init=30&amp;$limit=5
+        data:
+          productos:
+            - uuid: 59909623-0b85-46e2-a5f4-ca81e81e3464
+              nombre: PINT-Interoperabilidad-Gobierno
+              descripcion: >-
+                Producto para ofrecer distintas utilidades del API Manager para
+                consumo interno.\nPermite obtener listados de productos,
+                filtrarlos en función de su módulo técnico, obtener
+                sucripciones, etc.\n
+              contexto: /pdto/interoperabilidad-gobierno
+              version: 1.0.0
+              responsable: Marcos Carretero Poblete
+              usuario_creador: USR_GOB_API@dacm.comunidad.madrid
+            - uuid: ba3192f5-7ddf-4fdd-ac4e-97c206a13018
+              nombre: PINT-Interoperabilidad-Gobierno
+              descripcion: >-
+                Producto para ofrecer distintas utilidades del API Manager para
+                consumo interno.\nPermite obtener listados de productos,
+                filtrarlos en función de su módulo técnico, obtener
+                sucripciones, etc.\n
+              contexto: /pdto/interoperabilidad-gobierno
+              version: 1.0.1
+              responsable: Marcos Carretero Poblete
+              usuario_creador: USR_GOB_API@dacm.comunidad.madrid
+    suscripciones_response_example:
+      value:
+        result:
+          status: true
+          http_code: 206
+          info: Listado de suscripciones obtenido con éxito
+          trace_id: dc87d7a0-ec39-48bb-842b-60186005e595
+        metadata:
+          paging:
+            init: 15
+            limit: 5
+            num_page: 3
+            total: 35
+            total_pages: 7
+            links:
+              self:
+                href: /apis/{uuid_api}/suscripciones?$init=15&amp;$limit=5
+              previous:
+                href: /apis/{uuid_api}/suscripciones?$init=10&amp;$limit=5
+              next:
+                href: /apis/{uuid_api}/suscripciones?$init=20&amp;$limit=5
+              first:
+                href: /apis/{uuid_api}/suscripciones?$init=0&amp;$limit=5
+              last:
+                href: /apis/{uuid_api}/suscripciones?$init=30&amp;$limit=5
+        data:
+          suscripciones:
+            - usuario_suscriptor: USR_GOB_API@dacm.comunidad.madrid
+              aplicacion: WSO2APP_TEST_GOBIERNO_API
+              modulo_tecnico: PINT_REST_CATALOGO_APIM
+              cuota_uso: MDPSUS10000min
+              estado: UNBLOCKED
+            - usuario_suscriptor: USR_GOB_API@dacm.comunidad.madrid
+              aplicacion: DefaultApplication
+              cuota_uso: MDPSUS100min
+              estado: UNBLOCKED
+    definicion_api_swagger2_response_example:
+      value:
+        swagger: '2.0'
+        info:
+          version: v1
+          title: Catalogo-Apis
+          description: '----\n### Descripción de la API\n----\n'
+          contact:
+            name: Marcos Carretero Poblete
+            email: marcos.carretero@cloudappi.net
+        host: apiscmintra.val.comunidad.madrid
+        basePath: /tec/gob-api/catalogo-apis
+        schemes:
+          - https
+        consumes:
+          - application/json
+        produces:
+          - application/json
+        tags:
+          - name: monitorización
+            description: Etiqueta a aplicar al endpoint /status
+        paths:
+          /status:
+            get:
+              summary: Endpoint de monitorización de la API
+              description: >-
+                Propuesta de definición de la respuesta que debería ofrecer el
+                endpoint de monitorización previsto en el estándar.
+              tags:
+                - monitorización
+              responses:
+                '200':
+                  description: Estado correcto de la aplicación
+                  schema:
+                    referencia: '#/definitions/standard_status_endpoint_response'
+                  examples:
+                    application/json:
+                      result:
+                        status: true
+                        http_code: 200
+                        info: Solicitud realizada con éxito
+                        trace_id: 12345abcde
+                      data:
+                        current_date_time: 2022-05-11T13:44:33+0200
+                        app_version: 1.2.0 japi_rest_ejemplo_alumnos
+                        app_build_date_time: 2022-05-03T18:22:24+0200
+                        frw_version: JAPI 1.2.0
+                        systems:
+                          - system: BBDD
+                            status: true
+                          - system: JWKS de WSO2
+                            status: true
+                default:
+                  referencia: '#/responses/standard_server_error_response'
+        definitions:
+          standard_response_result:
+            properties:
+              result:
+                type: object
+                properties:
+                  status:
+                    type: boolean
+                    description: Resultado de éxito o error de la operación
+                    example: true
+                  http_code:
+                    type: integer
+                    format: int32
+                    description: Código http de la respuesta.
+                    example: 200
+                  info:
+                    type: string
+                    description: Breve mensaje indicando si la operación fue exitosa o no.
+                    example: Solicitud realizada con éxito.
+                  errors:
+                    type: array
+                    description: Array de errores.
+                    items:
+                      referencia: '#/definitions/standard_error'
+                  stack_trace:
+                    type: array
+                    description: >-
+                      Array que recoge los errores en caso de que sea necesario
+                      facilitar la depuración. Solo se incluirá en el entorno de
+                      desarrollo.
+                    items:
+                      type: object
+                      properties:
+                        method_name:
+                          type: string
+                          description: Método
+                          example: readJavaType
+                        file_name:
+                          type: string
+                          description: Nombre del archivo
+                          example: archivo.java
+                        line_number:
+                          type: integer
+                          format: int32
+                          description: Número de línea
+                          example: 36
+                        class_name:
+                          type: string
+                          description: Clase
+                          example: >-
+                            org.springframework.http.converter.json.AbstractJackson2HttpMessageConverter
+                        native_method:
+                          type: boolean
+                          description: Método nativo
+                          example: false
+                  trace_id:
+                    type: string
+                    description: >-
+                      Identificador de la petición en el sistema de logging para
+                      facilitar la depuración de errores. Contenido de la
+                      cabecera x-trace-id.
+                    example: b8240028-8df4-4019-8b03-182a0a9bc88d
+                  updated_elements:
+                    type: integer
+                    format: int32
+                    description: >-
+                      Número de elementos borrados o modificados cuando se
+                      reciben llamadas con métodos PUT o DELETE sobre varios
+                      recursos. Obligatorio para borrados lógicos.
+                    example: 0
+                required:
+                  - status
+                  - http_code
+                  - trace_id
+          standard_response:
+            allOf:
+              referencia: '#/definitions/standard_response_result'
+            required:
+              - result
+          standard_status_endpoint_response:
+            allOf:
+              referencia: '#/definitions/standard_response'
+            properties:
+              data:
+                type: object
+                description: >-
+                  Comprobaciones realizadas cuando se recibe la llamada al
+                  endpoint de status
+                properties:
+                  current_date_time:
+                    type: string
+                    format: date-time
+                    description: >-
+                      Fecha actual del servidor. Se usa para comprobar si el
+                      recurso se cachea
+                    example: 2022-05-11T13:44:33+0200
+                  app_version:
+                    type: string
+                    description: Versión y nombre de la aplicación
+                    example: 1.2.0 japi_rest_ejemplo_alumnos
+                  app_build_date_time:
+                    type: string
+                    format: date-time
+                    description: Fecha de compilación de la aplicacion (del jar)
+                    example: 2022-05-03T18:22:24+0200
+                  frw_version:
+                    type: string
+                    description: Versión del framework usado
+                    example: JAPI 1.2.0
+                  systems: null
+                  type: array
+                  description: Array de sistemas comprobados y resultados.
+                  items:
+                    referencia: '#/definitions/standard_status_endpoint_system_object'
+          standard_error:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+                description: Codigo de error devuelto por la API.
+                example: 1003
+              message:
+                type: string
+                description: Descripción textual del error devuelto
+                example: Atributo con valor superior al máximo
+            required:
+              - code
+              - message
+          standard_status_endpoint_system_object:
+            type: object
+            properties:
+              system:
+                type: string
+                description: Nombre del sistema probado
+                example: Database
+              status:
+                type: boolean
+                description: Estado del sistema probado
+                example: true
+        responses:
+          standard_server_error_response:
+            description: Default error response
+            schema:
+              referencia: '#/definitions/standard_response'
+            examples:
+              application/json:
+                result:
+                  status: false
+                  http_code: 500
+                  info: Error desconocido
+                  trace_id: 123456abcde
+                  errors:
+                    - code: 2000
+                      message: Mensaje de error
+    definicion_api_openapi3_response_example:
+      value:
+        openapi: 3.0.0
+        info:
+          version: v1
+          title: Catalogo-Apis
+          description: '###Descripción de la API'
+          contact:
+            name: Marcos Carretero Poblete
+            email: marcos.carretero@cloudappi.net
+        servers:
+          - url: >-
+              https://apiscmintra.val.comunidad.madrid/tec/gob-api/catalogo-apis/v1
+            description: URL de la API en el entorno de Validación para el tenant Super
+        tags:
+          - name: monitorización
+            description: Etiqueta a aplicar al endpoint /status
+        paths:
+          /status:
+            get:
+              summary: Endpoint de monitorización de la API
+              description: >-
+                Propuesta de definición de la respuesta que debería ofrecer el
+                endpoint de monitorización previsto en el estándar.\n
+              tags:
+                - monitorización
+              responses:
+                '200':
+                  referencia: '#/components/responses/standard_status_endpoint_response'
+                default:
+                  referencia: '#/components/responses/standard_server_error_response'
+        components:
+          schemas:
+            standard_response:
+              description: Respuesta estándar cuando un recurso devuelve un solo elemento
+              type: object
+              allOf:
+                - referencia: '#/components/schemas/standard_response_result'
+              required:
+                - result
+            standard_response_result:
+              description: >-
+                Objeto result que tienen que devolver todos los recursos,
+                correctos o incorrectos.
+              type: object
+              properties:
+                result:
+                  type: object
+                  properties:
+                    status:
+                      type: boolean
+                      description: Resultado de éxito o error de la operación
+                      example: true
+                    http_code:
+                      type: integer
+                      format: int32
+                      description: Código http de la respuesta.
+                      example: 200
+                    info:
+                      type: string
+                      description: >-
+                        Breve mensaje indicando si la operación fue exitosa o
+                        no.
+                      example: Solicitud realizada con éxito.
+                    errors:
+                      type: array
+                      description: >-
+                        Array de errores. Opcional. Se usará cuando se haya
+                        producido al menos un error, pudiéndose especificar
+                        tódos los que se hayan producido.
+                      items:
+                        referencia: '#/components/schemas/standard_error'
+                    stack_trace:
+                      type: array
+                      description: >-
+                        Array que recoge los errores en caso de que sea
+                        necesario facilitar la depuración. Solo se incluirá en
+                        el entorno de desarrollo.
+                      items:
+                        type: object
+                        properties:
+                          method_name:
+                            type: string
+                            description: Método
+                            example: readJavaType
+                          file_name:
+                            type: string
+                            description: Nombre del archivo
+                            example: archivo.java
+                          line_number:
+                            type: integer
+                            format: int32
+                            description: Número de línea
+                            example: 36
+                          class_name:
+                            type: string
+                            description: Clase
+                            example: >-
+                              org.springframework.http.converter.json.AbstractJackson2HttpMessageConverter
+                          native_method:
+                            type: boolean
+                            description: Método nativo
+                            example: false
+                    trace_id:
+                      type: string
+                      description: >-
+                        Identificador de la petición en el sistema de logging
+                        para facilitar la depuración de errores. Contenido de la
+                        cabecera x-trace-id.
+                      example: b8240028-8df4-4019-8b03-182a0a9bc88d
+                    updated_elements:
+                      type: integer
+                      format: int32
+                      description: >-
+                        Número de elementos borrados o modificados cuando se
+                        reciben llamadas con métodos PUT o DELETE sobre varios
+                        recursos. Obligatorio para borrados lógicos.
+                      example: 0
+                  required:
+                    - status
+                    - http_code
+                    - trace_id
+            standard_error:
+              description: >-
+                Modelo de error estándar a usar cuando se rellena el array de
+                errores.\nYa está referenciado en la respuesta estándar.\n
+              type: object
+              properties:
+                code:
+                  type: integer
+                  format: int32
+                  description: >-
+                    Se especificarán códigos de errores controlados. En el caso
+                    de errores no controlados se especificará si es posible. De
+                    lo contrario se deberá indicar un código 500.
+                  example: 1003
+                message:
+                  type: string
+                  description: Descripción textual del error devuelto
+                  example: Atributo con valor superior al máximo
+              required:
+                - code
+                - message
+            standard_status_endpoint_system_object:
+              description: Modelo de objeto de sistema para el endpoint de monitorización.
+              type: object
+              properties:
+                system:
+                  type: string
+                  description: Nombre del sistema probado
+                  example: Database
+                status:
+                  type: boolean
+                  description: Estado del sistema probado
+                  example: true
+          responses:
+            standard_server_error_response:
+              description: Error desconocido
+              headers:
+                x-trace-id:
+                  type: string
+              content:
+                application/json:
+                  schema:
+                    referencia: '#/components/schemas/standard_response'
+                  example:
+                    result:
+                      status: false
+                      http_code: 500
+                      info: Error desconocido
+                      trace_id: 123456abcde
+                      errors:
+                        - code: 2000
+                          message: Mensaje de error
+            standard_status_endpoint_response:
+              description: Status
+              headers:
+                x-trace-id:
+                  type: string
+              content:
+                application/json:
+                  schema:
+                    allOf:
+                      - referencia: '#/components/schemas/standard_response'
+                    properties:
+                      data:
+                        type: object
+                        description: >-
+                          Comprobaciones realizadas cuando se recibe la llamada
+                          al endpoint de status
+                        properties:
+                          current_date_time:
+                            type: string
+                            format: date-time
+                            description: >-
+                              Fecha actual del servidor. Se usa para comprobar
+                              si el recurso se cachea
+                            example: 2022-05-11T13:44:33+0200
+                          app_version:
+                            type: string
+                            description: Versión y nombre de la aplicación
+                            example: 1.2.0 pint_rest_catalogo_apis
+                          app_build_date_time:
+                            type: string
+                            format: date-time
+                            description: Fecha de compilación de la aplicacion (del jar)
+                            example: 2022-05-03T18:22:24+0200
+                          frw_version:
+                            type: string
+                            description: Versión del framework usado
+                            example: JAPI 1.2.0
+                          systems:
+                            type: array
+                            description: Array de sistemas comprobados y resultados.
+                            items:
+                              referencia: >-
+                                #/components/schemas/standard_status_endpoint_system_object
+                  examples:
+                    Ejemplo 1:
+                      referencia: >-
+                        #/components/examples/standard_status_endpoint_response_example
+          examples:
+            standard_status_endpoint_response_example:
+              value:
+                result:
+                  status: true
+                  http_code: 200
+                  info: Solicitud realizada con éxito
+                  trace_id: 12345abcde
+                data:
+                  current_date_time: 2022-05-11T13:44:33+0200
+                  app_version: 1.2.0 pint_rest_catalogo_apis
+                  app_build_date_time: 2022-05-03T18:22:24+0200
+                  frw_version: JAPI 1.2.0
+                  systems:
+                    - system: BBDD
+                      status: true
+                    - system: JWKS de WSO2
+                      status: true
+  requestBodies:
+    standard_filter_body_param:
+      description: >
+        Parámetro de consulta de filtrado complejo a través de cuerpo de
+        petición.
+
+        Se debe utilizar mediante una petición de caso especial POST como GET.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              $filter:
+                $ref: '#/components/schemas/standard_filter_object'
+          examples:
+            Ejemplo 1:
+              value:
+                $filter:
+                  operation: EQ
+                  values:
+                    - property: property_1
+                      prop_type: INTEGER
+                      prop_value: '7'
+      required: false
+    standard_delete_multiple_body_param:
+      description: >
+        Ejemplo de cuerpo de petición que contiene un listado de los
+        identificadores 
+
+        de recursos a eliminar en una operación de borrado múltiple.
+
+        Se debe usar en los endpoints de borrado masivo.
+
+        Su definición es un ejemplo, dado que los identificadores pueden ser de
+        distinto tipo. 
+
+        La definición de este cuerpo dependerá del recurso.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              data:
+                type: array
+                description: >-
+                  Array con los identificadores o UUIDs de los recursos a
+                  eliminar.
+                items:
+                  type: object
+                  properties:
+                    uuid:
+                      type: string
+                      description: UUID del recurso
+                      format: uuid
+                      example: 2bd80c5a-fc3f-49a7-b79a-0c174e19aef6
+                    id:
+                      type: integer
+                      description: Identificador del recurso
+                      format: int32
+          examples:
+            Ejemplo 1:
+              value:
+                - uuid: 2bd80c5a-fc3f-49a7-b79a-0c174e19aef6
+                - uuid: 497faaf6-5aab-425b-bb6d-a8e374c6ec98
+      required: true
+  securitySchemes:
+    default:
+      type: oauth2
+      flows:
+        implicit:
+          authorizationUrl: https://apiscmintra.val.comunidad.madrid/authorize
+          scopes: {}

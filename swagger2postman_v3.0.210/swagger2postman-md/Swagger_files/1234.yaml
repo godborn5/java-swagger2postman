@@ -1,0 +1,106 @@
+openapi: 3.0.1
+info:
+  title: API de ejemplo completa
+  description: API de prueba que incluye varios endpoints para tests.
+  version: "1.0"
+servers:
+  - url: http://localhost:8080
+paths:
+  /hello:
+    get:
+      summary: Devuelve un saludo
+      responses:
+        "200":
+          description: OK
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: "Hola desde Swagger 🚀"
+
+  /users:
+    get:
+      summary: Lista todos los usuarios
+      responses:
+        "200":
+          description: Lista de usuarios
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                      example: 1
+                    name:
+                      type: string
+                      example: Juan Pérez
+
+    post:
+      summary: Crea un nuevo usuario
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: María López
+      responses:
+        "201":
+          description: Usuario creado
+
+  /users/{id}:
+    get:
+      summary: Obtiene un usuario por ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            example: 1
+      responses:
+        "200":
+          description: Usuario encontrado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    example: 1
+                  name:
+                    type: string
+                    example: Juan Pérez
+        "404":
+          description: Usuario no encontrado
+
+  /products:
+    get:
+      summary: Devuelve lista de productos
+      responses:
+        "200":
+          description: Lista de productos
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                      example: 101
+                    name:
+                      type: string
+                      example: Teclado mecánico
+                    price:
+                      type: number
+                      format: float
+                      example: 59.99

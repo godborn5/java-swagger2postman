@@ -1,0 +1,2075 @@
+# PLANTILLA DE DEFINICIÓN DE APIs.
+# VERSIÓN: 1
+# FECHA: 03/09/2020
+# AUTOR: Gobierno API MD
+# REVISIONES:
+# - 12/05/2020. Se modifica la herencia en la respuesta estándar y todas sus variantes. (e_dmd29)
+# - 17/08/2020. Se eliminan los recursos POST /get /put y /delete (e_dmd29)
+# - 03/09/2020. Se usa como ejemplo del recurso clientes (jlc)
+# - 26/10/2020. Se incluye la obligatoriedad de uso de la plantilla, los campos summary y description, una etiqueta por endpoint 
+#   y la documentación de las mismas, la definición de un body por cada respuesta excepto la 204 y el uso de la 
+#   respuesta por defecto para errores no controlados.  (e_dmd29)
+# - 30/10/2020: Se recuperan los recursos POST /get y POST/delete (e_dmd29)
+# - 11/12/2020: Correción de errores menores que provocan fallos en Sonar API. Falta de ejemplos en propiedades de tipos primitivos,
+#   Respuestas 400 obligatorias no implementadas y cabecera Location en respuestas 201 a operaciones POST (e_dmd29)
+# - 12/12/2021: Se añade recomendación de guardar el archivo con codificación ISO-8859-1 para evitar errores con las tildes y caracteres especiales en SVN (e_dmd29).
+# - 17/02/2021: Se modifica la última recomendación para recomendar guardar en UTF-8 (e_dmd29).
+# - 07/05/2021 (e_jdg125):
+#     - Creación de un nuevo recurso (expediente) y varios endpoints asociados para ejemplificar:
+#         1) El paso de consulta compleja en el cuerpo de la petición mediante el parámetro filter.
+#         2) El uso de la relación de recursos en el árbol del path (/recurso/{id_recurso}/subrecurso).
+#     - Modificación del título de la API para evitar errores en la publicación. Inclusión de comentario que indica que no se pueden añadir espacios en blanco.
+#     - Creación del modelo de respuesta post_cliente_response para ejemplificar la devolución de contenido parcial de un recurso.
+#     - Modificación de los modelos standard_filter_value, standard_filter_object y standard_filter_object_base para adecuarlos a normativa y a requerimientos
+#       estándares de la herramienta SonarAPI.
+#     - Corrección de errores menores que provocaban fallos en la herramienta SonarAPI, como la falta de un ejemplo en una propiedad de tipo primitivo y en el
+#       modelo de respuesta standard_delete_response.
+#     - Modificación del parámetro de ejemplo body_param_example para simplificarlo.
+#     - Creación del parámetro filter_body_param para facilitar su uso y evitar posibles errores en su definición.
+#     - Matización y añadido de algunos comentarios para hacer la plantilla más descriptiva e intuitiva.
+# - 22/12/2021: Inclusión de nuevos ejemplos relacionados con ficheros (e_jdg125):
+#     - El endpoint POST /expedientes/{id_expediente}/ficheros, de subida de un fichero.
+#     - El endpoint GET /expedientes/{id_expediente}/ficheros/{id_fichero}, que devuelve un fichero.
+# - 28/01/2022: Modificación del parámetro id_cliente. Ahora es uuid_cliente y ejemplifica el uso de UUIDs como identificador de recurso (e_jdg125).
+# - 11/04/2022: Modificación del parámetro stack_trace de standard_response_result. Es un array de objetos con diferentes propiedades, no un string (e_jdg125).
+# - 11/04/2022: Modificación del parámetro stack_trace de standard_response_result. Los nombres de sus propiedades se definen con snake_case en lugar de camelCase (e_jdg125).
+# - 13/06/2022: Modificación de la respuesta del recurso /status. Se actualiza la información devuelta de acuerdo a las modificaciones realizadas en JAPI (e_jdg125).
+# - 26/04/2023: Pequeños cambios en la ficha para que todos los ejemplos coincidan con sus modelos (e_mcp419):
+#     - Modificación del modelo 'cliente' para que la propiedad 'fecha_hora_alta' tenga el formato correcto date-time.
+#     - Modificación de la respuesta de éxito para GET /clientes/{uuid_cliente}/expedientes para que la propiedad 'num_paginas' se refleje como un entero.
+#     - Modificación del ejemplo de respuesta de éxito del endpoint de monitorización para que las propiedades 'status' de los sistemas se muestren como booleanos.
+# - 07/09/2023: Añadidos el media type multipart/form-data y application/pdf al consumes y produces por defecto, respectivamente. (e_mcp419)
+# - 15/03/2024: Añadidas anotaciones específicas en los 'allOf' para que no se creen directamente modelos en dicho array. (e_mcp419)
+# - 15/03/2024: Añadido un ejemplo de definición de scopes a los endpoints POST /clientes y GET /clientes. (e_mcp419)
+#
+#############################################################################################################################
+#
+################################################################################
+#                                                                              #
+#                         --RECOMENDACIONES TÉCNICAS--                         #
+#                                                                              #
+#   * No usar líneas en blanco en la definición para facilitar la validación   #
+#     automatizada de la misma. Usar # al principio de la línea para dejarla   #
+#     comentada si se desea incluir líneas en blanco.                          #
+#                                                                              #
+#   * Guardar el archivo con la definición codificado en UTF-8 para evitar     #
+#     errores de codificación al subirlo a SVN. Consultar la documentación     #
+#     de la herramienta que estemos usando para editar el archivo. Se debe     #
+#     configurar adecuadamente el entorno para que la codificación por de-     #
+#     fecto sea UTF-8.                                                         #
+#                                                                              #
+################################################################################
+#
+################################################################################
+#                                                                              #
+#                    --NORMAS Y RECOMENDACIONES GENERALES--                    #
+#                                                                              #
+#    * Es OBLIGATORIO partir de esta plantilla para definir cualquier API      #
+#      que cumpla el estándar de definición de APIs de Madrid Digital.         #
+#                                                                              #
+#    * Los elementos que comienzan por 'standard', NO se pueden eliminar       #
+#      ni modificar.                                                           #
+#                                                                              #
+#    * Se deben incluir siempre descripciones de todo lo que sea posible:      #
+#      endpoints, recursos, subrecursos, propiedades, respuestas, etc.         #
+#      El elemento description permite enriquecer la documentación de la       #
+#      API. Se puede usar HTML o markdown para darles un formato adecuado.     #
+#                                                                              #
+#    * Reutilizar todos los elementos posibles.                                #
+#      Si un modelo se usa en varios recursos se debe definir en la sección    #
+#      'definitions' y reutilizarlo mediante $ref donde sea necesario. Los     #
+#      parámetros reutilizables se definen en la sección 'parameters', y       #
+#      las respuestas en la sección 'responses'.                               #
+#                                                                              #
+#    * Definir ejemplos de respuesta para todos los endpoints.                 #
+#      En el caso de respuestas reutilizables se especifican en la definición  #
+#      de las mismas, en la sección 'responses'. Los ejemplos deben coincidir  #
+#      con el modelo. De igual forma, deben definirse ejemplos para las        #
+#      propiedades de los objetos.                                             #
+#                                                                              #
+#    * Eliminar de la definición todos aquellos elementos que no se usen,      #
+#      a excepción de aquellos que se indica que no deben ser eliminados.      #
+#                                                                              #
+#    * Organizar los recursos mediante etiquetas (tags) [OBLIGATORIO].         #
+#      La forma recomendada de organizar los recursos es agruparlos en         #
+#      etiquetas por recurso y acciones. Para las acciones se recomienda       #
+#      dividirlas en consultas y modificación, como en esta plantilla.         #
+#      Las peticiones con método GET se agrupan como consultas y las que       #
+#      tienen métodos POST, PUT y DELETE como modificaciones.                  #
+#      Si se tuvieran más recursos se agruparían del mismo modo.               #
+#      Por ejemplo, si tuviéramos otro recurso llamado cuentas, sería:         #
+#         - cuentas (consultas)                                                #
+#         - cuentas (modificación)                                             #
+#      También es OBLIGATORIO documentar las etiquetas tal y como se ha        #
+#      expuesto previamente en la sección 'tags' de esta plantilla.            #
+#                                                                              #
+#    * Especificar los códigos de error internos particulares de la API        #
+#      en cada recurso que apliquen. Existen códigos de error de uso general   #
+#      que ya están incorporados en el arquetipo Atlas 2. Estos no es          #
+#      necesario especificarlos. Dichos códigos son los siguientes:            #
+#         - 1000: atributo con valor nulo                                      #
+#         - 1001: atributo con tamaño superior al máximo permitido             #
+#         - 1002: atributo con valor inferior al mínimo                        #
+#         - 1003: atributo con valor superior al máximo                        #
+#         - 1004: el atributo no cumple la expresión regular de validación     #
+#         - 1005: el atributo no tiene el formato de fecha sin hora requerido  #
+#         - 1006: el atributo no tiene el formato de fecha con hora requerido  #
+#         - 1007: atributo con un valor distinto a los permitidos              #
+#         - 1008: el atributo no llega a la longitud mínima                    #
+#         - 1009: el atributo supera la longitud máxima                        #
+#         - 1100: filtrado por propiedad inexistente                           #
+#         - 1101: error al validar la entidad                                  #
+#         - 1102: error de conexión con BBDD                                   #
+#         - 1103: propiedad no encontrada en búsqueda en BBDD                  #
+#         - 1104: elemento no encontrado                                       #
+#         - 1105: error al transformar la fecha                                #
+#         - 1106: mensaje de error con más parámetros de los necesarios        #
+#         - 1200: recurso no encontrado                                        #
+#         - 1201: parámetro vacío o incorrecto en el cuerpo de la petición     #
+#         - 1202: cuerpo de la petición vacío o con formato incorrecto         #
+#         - 1203: error en conversión de tipos                                 #
+#         - 1204: URL no normalizada                                           #
+#                                                                              #
+################################################################################
+swagger: '2.0'
+info:
+  version: v1
+  # El título de la API debe indicarse como en este ejemplo.
+  # IMPORTANTE: No se deben incluir espacios en blanco.
+  # Si consta de varias palabras, deben separarse por guiones.
+  title: Plantilla-API-MD
+  description: |
+    ----
+    ### Descripción del API
+    Api para la gestión de clientes
+    Aquí se describirá la funcionalidad general del API...
+    ### Códigos de error de todo el API (se especifican en cada recurso):
+    |Código|Error|
+    | -- | -- |
+    |2001|Tipo de cliente no valido|
+    |2002|Fecha de nacimiento incorrecta|
+    |2003|Error de negocio xxxx|
+    |2004|Error de negocio yyyy|
+    ----
+  contact:
+    name: Nombre del API owner o del área responsable
+    url: http://urldesoporte.com
+    email: email.de.area.responsable@madrid.org
+host: apis.comunidad.madrid
+# hosts en función del tipo de acceso y del entorno:
+# Desarrollo: apis.des.comunidad.madrid
+# Validación: apis.val.comunidad.madrid
+# Producción:
+#   Internet: apis.comunidad.madrid
+#   Intranet: apisintra.comunidad.madrid
+#
+# El elemento basePath debe ser el que se haya acordado en la ficha de proyecto. El siguiente es sólo un ejemplo
+basePath: /ciencia-tecnologia/test-api
+schemes:
+- https
+# Definición de formatos de entrada y salida para toda la API. 
+# Deben ser formatos conformes a estándar RFC 6838. 
+# Si algún endpoint necesita añadir o cambiar los formatos puede sobreescribirse la 
+# configuración a nivel de endpoint, usando las mismas palabras reservadas en el path y operación a modificar.
+consumes:
+- application/json
+- multipart/form-data
+produces:
+- application/json
+- application/pdf
+# Es OBLIGATORIO documentar las etiquetas que agrupan los endpoints en esta sección.
+# IMPORTANTE: Tener en cuenta las recomendaciones sobre la organización de los recursos mediante etiquetas descritas al inicio del documento.
+tags:
+  # La primera etiqueta es un ejemplo. Se debe borrar cuando se definan las etiquetas propias de la API.
+  # Consta de tres elementos: name (nombre de la etiqueta), description (descripción) y, opcionalmente, enlaces externos
+  # que documenten la etiqueta
+  - name: nombre de la etiqueta
+    description: Breve descripción de la etiqueta
+    externalDocs:
+      url: http://docs.my-api.com/pet-operations.htm
+  # Las siguientes etiquetas se usan en el recurso de ejemplo (clientes). Se deben ajustar a las etiquetas propias de la API
+  # o eliminarlas si se prefiere definir las etiquetas propias desde cero.    
+  - name: clientes (consultas)
+    description: Agrupa las consultas sobre el recurso clientes, ya sean individuales o sobre la colección completa.
+  - name: clientes (modificación)
+    description: Agrupa las operaciones de creación, modificación y borrado de clientes individuales.
+  - name: expedientes (consultas)
+    description: Agrupa las consultas sobre el recurso expedientes, ya sean individuales o sobre la colección completa.
+  - name: expedientes (modificación)
+    description: Agrupa las operaciones de creación, modificación y borrado de expedientes individuales.
+  # Esta etiqueta es estándar, no debe eliminarse
+  - name: monitorización
+    description: Etiqueta a aplicar al endpoint /status
+paths:
+  ##################################################################
+  #                                                                #
+  #                          --IMPORTANTE--                        #
+  #                                                                #    
+  #     Todos los comentarios incluidos en el primer endpoint      #
+  #     (GET /clientes) sirven como referencia y deben tenerse     #
+  #     en cuenta a la hora de definir el resto de endpoints.      #
+  #                                                                #
+  ##################################################################
+  /clientes:
+    get:
+      # 'summary': Es OBLIGATORIO usar este elemento en todos los paths. Se trata de una breve descripción del endpoint
+      summary: Obtención de una colección de clientes
+      # 'description': es OBLIGATORIO que el contenido de este campo esté cumplimentado y no sea igual al del campo 'summary'
+      # Debe darse una descripción lo más detallada posible de la funcionalidad del endpoint sin describir la lógica de negocio.
+      description: | 
+        Permite obtener una colección de clientes.
+        Admite cabeceras y *query parameters*.
+      tags:
+      # IMPORTANTE: Las recomendaciones sobre la organización de los recursos mediante etiquetas están al inicio del documento.
+      - clientes (consultas)
+      # 'parameters': Definir solo los necesarios para cada endpoint.
+      # IMPORTANTE: Si la petición requiere un cuerpo de entrada no debe definirse más de uno. 
+      # De lo contrario no se superará la validación automática del documento.
+      parameters:
+      - $ref: '#/parameters/standard_init_param'
+      - $ref: '#/parameters/standard_limit_param'
+      - $ref: '#/parameters/standard_total_param'
+      - $ref: '#/parameters/standard_select_param'
+      - $ref: '#/parameters/standard_exclude_param'
+      - $ref: '#/parameters/standard_expand_param'
+      - $ref: '#/parameters/standard_order_by_param'
+      - $ref: '#/parameters/standard_trace_id_header_param'
+      - $ref: '#/parameters/query_param_example'
+      - $ref: '#/parameters/header_param_example'
+      # 'responses': Este elemento es OBLIGATORIO en swagger. No puede definirse un path sin respuestas.
+      # OBLIGATORIO: Todas las respuestas, a excepción de la respuesta con código de estado 204, deben tener definido un esquema (cuerpo de la respuesta).
+      # OBLIGATORIO: Debe usarse la respuesta 'default' para los errores no controlados que puedan producirse (código de estado 500).
+      responses:
+        206:
+          description: Lista de clientes obtenida
+          schema:
+            $ref: '#/definitions/clientes_response' 
+          examples:
+            application/json:
+              result:
+                status: true
+                http_code: 206
+                trace_id: 12345abcde
+              metadata:
+                paging:
+                  init: 15
+                  limit: 5
+                  num_page: 3
+                  total: 35
+                  total_pages: 7
+                  links:
+                    self:
+                      href: '/clientes?$init=15&amp;$limit=5'
+                    previous:
+                      href: '/clientes?$init=10&amp;$limit=5'
+                    next:
+                      href: '/clientes?$init=20&amp;$limit=5'
+                    first:
+                      href: '/clientes?$init=0&amp;$limit=5'
+                    last:
+                      href: '/clientes?$init=30&amp;$limit=5'
+              data:
+                clientes:
+                  - uuid: 'ab7079d6-2939-4368-8cf2-600f499188ed'
+                    nombre: 'Juan'
+                    edad: 40
+                    fecha_nacimiento: '1980-05-20'
+                    fecha_hora_alta: '2020-03-15T23:55:33+01:00'
+                    tipo_cliente: 'N'
+                    baja: false
+                  - uuid: '23534e70-baad-40b0-a7de-66e4b1580134'
+                    nombre: 'Pepe'
+                    edad: 35
+                    fecha_nacimiento: '1985-05-20'
+                    fecha_hora_alta: '2020-04-16T23:55:33+01:00'
+                    tipo_cliente: 'A'                    
+                    baja: false     
+        400:
+          $ref: '#/responses/standard_bad_request_response'
+        401:
+          $ref: '#/responses/standard_unauthorized_response'
+        403:
+          $ref: '#/responses/standard_forbidden_response'
+        429:
+          $ref: '#/responses/standard_too_many_requests_response'
+        default:
+          $ref: '#/responses/standard_server_error_response'
+      # 'security': Definir los mecanismos de seguridad con los que va a contar el endpoint. En este ejemplo se define un scope de consulta.
+      # IMPORTANTE: Se debe utilizar siempre y cuando el endpoint cuente con scopes. En caso contrario, debe eliminarse.
+      # IMPORTANTE: Si se necesita esta declaración de seguridad, únicamente se deben modificar los nombres de los scopes.
+      # IMPORTANTE: Este apartado requiere de otro llamado 'securityDefinitions' a nivel de documento.
+      security:
+        # El objeto 'default' debe mantener su nombre
+        - default:
+          # Listado de todos los scopes con los que va a contar el endpoint. Suelen seguir la siguiente nomenclatura: POAP_SC_PERMISO
+          - PINT_SC_CONSULTA
+    post:
+      summary: Creación de un cliente dentro de la colección
+      description: |
+        Permite crear un cliente aportando los datos necesarios para su creación. 
+        Requiere obligatoriamente dichos datos en el *body* de la petición.
+        ### Códigos de error del método:
+        | Código | Error |
+        | -- | -- |
+        |2001|Tipo de cliente no valido|
+        |2002|Fecha de nacimiento incorrecta|
+        |2003|Error de negocio xxxx|
+      tags:
+      - clientes (modificación)
+      parameters:      
+      - $ref: '#/parameters/standard_trace_id_header_param'
+      - $ref: '#/parameters/post_cliente_body_param'
+      - $ref: '#/parameters/header_param_example'
+      responses:
+        201:
+          description: Datos parciales del cliente insertado (uso del objeto de respuesta específico post_cliente_response)
+          schema:
+            $ref: '#/definitions/post_cliente_response'
+          # Esta cabecera es obligatoria en los endpoints de creación de recursos, no así en los de modificación.
+          headers:
+            Location:
+              type: string
+              format: uri
+              description: URL del recurso recien creado
+          examples:
+            application/json:
+              result:
+                status: true
+                http_code: 201
+                trace_id: 12345abcde
+              data:
+                uuid: 'ab7079d6-2939-4368-8cf2-600f499188ed'
+                nombre: 'Juan'
+        400:
+          $ref: '#/responses/standard_bad_request_response'
+        401:
+          $ref: '#/responses/standard_unauthorized_response'
+        403:
+          $ref: '#/responses/standard_forbidden_response'
+        429:
+          $ref: '#/responses/standard_too_many_requests_response'
+        default:
+          $ref: '#/responses/standard_server_error_response'
+      # 'En este ejemplo de 'security' se define un scope de gestor y otro de administrador.
+      # IMPORTANTE: Se debe utilizar siempre y cuando el endpoint cuente con scopes. En caso contrario, debe eliminarse.
+      security:
+        - default:
+          # Listado de todos los scopes con los que va a contar el endpoint. Suelen seguir la siguiente nomenclatura: POAP_SC_PERMISO
+          - PINT_SC_GESTOR
+          - PINT_SC_ADMINISTRADOR
+  /clientes/get:
+    post:
+      summary: Obtención de una colección de clientes con parámetro de consulta sensible
+      description: | 
+        Permite obtener una colección de clientes.
+        Opcionalmente, permite introducir un parámetro de naturaleza sensible en el cuerpo de la petición, como por ejemplo el NIF.
+      tags:
+      - clientes (consultas)
+      parameters:
+      - $ref: '#/parameters/standard_init_param'
+      - $ref: '#/parameters/standard_limit_param'
+      - $ref: '#/parameters/standard_total_param'
+      - $ref: '#/parameters/standard_select_param'
+      - $ref: '#/parameters/standard_exclude_param'
+      - $ref: '#/parameters/standard_expand_param'
+      - $ref: '#/parameters/standard_order_by_param'
+      - $ref: '#/parameters/standard_trace_id_header_param'
+      - $ref: '#/parameters/query_param_example'
+      - $ref: '#/parameters/header_param_example'
+      - $ref: '#/parameters/body_param_example'
+      responses:
+        206:
+          description: Lista de clientes obtenida
+          schema:
+            $ref: '#/definitions/clientes_response' 
+          examples:
+            application/json:
+              result:
+                status: true
+                http_code: 206
+                trace_id: 12345abcde
+              metadata:
+                paging:
+                  init: 15
+                  limit: 5
+                  num_page: 3
+                  total: 35
+                  total_pages: 7
+                  links:
+                    self:
+                      href: '/clientes?$init=15&amp;$limit=5'
+                    previous:
+                      href: '/clientes?$init=10&amp;$limit=5'
+                    next:
+                      href: '/clientes?$init=20&amp;$limit=5'
+                    first:
+                      href: '/clientes?$init=0&amp;$limit=5'
+                    last:
+                      href: '/clientes?$init=30&amp;$limit=5'
+              data:
+                clientes:
+                  - uuid: 'e1845637-a6c6-4281-b276-faf567a35454'
+                    nombre: 'Juan'
+                    edad: 40
+                    fecha_nacimiento: '1980-05-20'
+                    fecha_hora_alta: '2020-03-15T23:55:33+01:00'
+                    tipo_cliente: 'N'
+                    baja: false
+                  - uuid: 'ab7079d6-2939-4368-8cf2-600f499188ed'
+                    nombre: 'Pepe'
+                    edad: 35
+                    fecha_nacimiento: '1985-05-20'
+                    fecha_hora_alta: '2020-04-16T23:55:33+01:00'
+                    tipo_cliente: 'A'                    
+                    baja: false     
+        400:
+          $ref: '#/responses/standard_bad_request_response'
+        401:
+          $ref: '#/responses/standard_unauthorized_response'
+        403:
+          $ref: '#/responses/standard_forbidden_response'
+        429:
+          $ref: '#/responses/standard_too_many_requests_response'
+        default:
+          $ref: '#/responses/standard_server_error_response'
+  /clientes/{uuid_cliente}:
+    get:
+      summary: Obtención de un cliente por su UUID
+      description: | 
+        Permite obtener un cliente mediante su UUID único.
+        Dicho UUID es un parámetro obligatorio en la URL.
+      tags:
+      - clientes (consultas)
+      parameters:
+      - $ref: '#/parameters/standard_select_param'
+      - $ref: '#/parameters/standard_exclude_param'
+      - $ref: '#/parameters/standard_expand_param'
+      - $ref: '#/parameters/standard_trace_id_header_param'
+      - $ref: '#/parameters/uuid_cliente_param'
+      - $ref: '#/parameters/query_param_example'
+      - $ref: '#/parameters/header_param_example'
+      responses:
+        200:
+          description: Cliente encontrado y obtenido correctamente
+          schema:
+            $ref: '#/definitions/cliente_response'   
+          examples:
+            application/json:
+              result:
+                status: true
+                http_code: 200
+                trace_id: 12345abcde
+              data:
+                  uuid: '23534e70-baad-40b0-a7de-66e4b1580134'
+                  nombre: 'Juan'
+                  edad: 40
+                  fecha_nacimiento: '1980-05-20'
+                  fecha_hora_alta: '2020-03-15T23:55:33+01:00'
+                  tipo_cliente: 'N'
+                  baja: false
+        400:
+          $ref: '#/responses/standard_bad_request_response'
+        401:
+          $ref: '#/responses/standard_unauthorized_response'
+        403:
+          $ref: '#/responses/standard_forbidden_response'
+        404:
+          $ref: '#/responses/standard_not_found_response'
+        429:
+          $ref: '#/responses/standard_too_many_requests_response'
+        default:
+          $ref: '#/responses/standard_server_error_response'
+    put:
+      summary: Modificación de un cliente
+      description: |
+        Permite modificar un cliente mediante su UUID único. 
+        Dicho UUID es un parámetro obligatorio en la URL. 
+        Los datos del cliente a modificar se incluirán en el *body* de la petición
+        ### Códigos de error del método:
+        | Código | Error |
+        | -- | -- |
+        |2001|Tipo de cliente no valido|
+        |2002|Fecha de nacimiento incorrecta|
+        |2003|Error de negocio xxxx|
+      tags:
+      - clientes (modificación)
+      parameters:
+      - $ref: '#/parameters/standard_trace_id_header_param'
+      - $ref: '#/parameters/uuid_cliente_param'
+      - $ref: '#/parameters/put_cliente_body_param'
+      - $ref: '#/parameters/header_param_example'
+      responses:
+        200:
+          description: Datos completos del cliente actualizado
+          schema:
+            $ref: '#/definitions/cliente_response'
+          examples:
+            application/json:
+              result:
+                status: true
+                http_code: 200
+                trace_id: 12345abcde
+              data:
+                uuid: '23534e70-baad-40b0-a7de-66e4b1580134'
+                nombre: 'Juan'
+                edad: 40
+                fecha_nacimiento: '1980-05-20'
+                fecha_hora_alta: '2020-03-15T23:55:33+01:00'
+                tipo_cliente: 'N'
+                baja: false  
+        400:
+          $ref: '#/responses/standard_bad_request_response'
+        401:
+          $ref: '#/responses/standard_unauthorized_response'
+        403:
+          $ref: '#/responses/standard_forbidden_response'
+        404:
+          $ref: '#/responses/standard_not_found_response'
+        429:
+          $ref: '#/responses/standard_too_many_requests_response'
+        default:
+          $ref: '#/responses/standard_server_error_response'
+    delete:
+      summary: Eliminación de un cliente
+      description: |
+        Permite eliminar un cliente mediante su UUID único.
+        Dicho UUID es un parámetro obligatorio en la URL.
+        Adicionalmente puede admitir cabeceras.
+      tags:
+      - clientes (modificación)
+      parameters:
+      - $ref: '#/parameters/uuid_cliente_param'
+      - $ref: '#/parameters/standard_trace_id_header_param'
+      - $ref: '#/parameters/header_param_example'
+      responses:
+        200:
+          $ref: '#/responses/standard_delete_response'
+        400:
+          $ref: '#/responses/standard_bad_request_response'
+        401:
+          $ref: '#/responses/standard_unauthorized_response'
+        403:
+          $ref: '#/responses/standard_forbidden_response'
+        404:
+          $ref: '#/responses/standard_not_found_response'
+        429:
+          $ref: '#/responses/standard_too_many_requests_response'
+        default:
+          $ref: '#/responses/standard_server_error_response'
+  /clientes/delete:
+    post:
+      summary: Eliminación de uno o más clientes
+      description: |
+        Permite eliminar uno o más clientes mediante sus UUIDs.
+        Los UUIDs deben especificarse en el cuerpo de la petición por medio de un array.
+        Para borrados mútiples se debe incluir en la respuesta el número de registros eliminados
+        mediante el campo _updated_elements_ del objeto _result_.
+        Adicionalmente puede admitir cabeceras.
+      tags:
+      - clientes (modificación)
+      parameters:
+      - $ref: '#/parameters/standard_trace_id_header_param'
+      - $ref: '#/parameters/delete_multiple_body_param_example'
+      - $ref: '#/parameters/header_param_example'
+      responses:
+        200:
+          description: Listado de UUIDs de los clientes eliminados correctamente.
+          schema:
+            $ref: '#/definitions/standard_multi_delete_response'
+          examples:
+            application/json:
+              result:
+                status: true
+                http_code: 200
+                info: Solicitud realizada con éxito
+                trace_id: 12345abcde
+                updated_elements: 2
+              data:
+                deleted_elements:
+                - '23534e70-baad-40b0-a7de-66e4b1580134'
+                - 'fbb97dd2-815e-4f22-adf9-36fde44d3dac'
+        400:
+          $ref: '#/responses/standard_bad_request_response'
+        401:
+          $ref: '#/responses/standard_unauthorized_response'
+        403:
+          $ref: '#/responses/standard_forbidden_response'
+        404:
+          $ref: '#/responses/standard_not_found_response'
+        429:
+          $ref: '#/responses/standard_too_many_requests_response'
+        default:
+          $ref: '#/responses/standard_server_error_response'
+  /expedientes:
+    get:
+      summary: Obtención de una colección de expedientes
+      description: | 
+        Permite obtener una colección de expedientes.
+        Admite cabeceras y *query parameters*.
+      tags:
+      - expedientes (consultas)
+      parameters:
+      - $ref: '#/parameters/standard_init_param'
+      - $ref: '#/parameters/standard_limit_param'
+      - $ref: '#/parameters/standard_total_param'
+      - $ref: '#/parameters/standard_select_param'
+      - $ref: '#/parameters/standard_exclude_param'
+      - $ref: '#/parameters/standard_expand_param'
+      - $ref: '#/parameters/standard_order_by_param'
+      - $ref: '#/parameters/standard_trace_id_header_param'
+      - $ref: '#/parameters/query_param_example'
+      - $ref: '#/parameters/header_param_example'
+      responses:
+        206:
+          description: Lista de expedientes obtenida
+          schema:
+            $ref: '#/definitions/expedientes_response' 
+          examples:
+            application/json:
+              result:
+                status: true
+                http_code: 206
+                trace_id: 12345abcde
+              metadata:
+                paging:
+                  init: 15
+                  limit: 5
+                  num_page: 3
+                  total: 35
+                  total_pages: 7
+                  links:
+                    self:
+                      href: '/expedientes?$init=15&amp;$limit=5'
+                    previous:
+                      href: '/expedientes?$init=10&amp;$limit=5'
+                    next:
+                      href: '/expedientes?$init=20&amp;$limit=5'
+                    first:
+                      href: '/expedientes?$init=0&amp;$limit=5'
+                    last:
+                      href: '/expedientes?$init=30&amp;$limit=5'
+              data:
+                expedientes:
+                  - id: 1
+                    titulo: 'Expediente 1'
+                    num_paginas: 10
+                    fecha_creacion: '1990-07-04'
+                    ultima_revision: '2021-03-21'
+                  - id: 2
+                    titulo: 'Expediente 2'
+                    num_paginas: 20
+                    fecha_creacion: '1999-12-24'
+                    ultima_revision: '2021-01-03'
+        400:
+          $ref: '#/responses/standard_bad_request_response'
+        401:
+          $ref: '#/responses/standard_unauthorized_response'
+        403:
+          $ref: '#/responses/standard_forbidden_response'
+        429:
+          $ref: '#/responses/standard_too_many_requests_response'
+        default:
+          $ref: '#/responses/standard_server_error_response'
+  /expedientes/get:
+    post:
+      summary: Obtención de una colección de expedientes con parámetros de consulta y filtrado
+      description: | 
+        Permite obtener una colección de expedientes, con la posibilidad de definir una consulta
+        filtrada en el cuerpo de la petición mediante el parámetro filter_body_param.
+      tags:
+      - expedientes (consultas)
+      parameters:
+      - $ref: '#/parameters/standard_init_param'
+      - $ref: '#/parameters/standard_limit_param'
+      - $ref: '#/parameters/standard_total_param'
+      - $ref: '#/parameters/standard_order_by_param'
+      - $ref: '#/parameters/standard_trace_id_header_param'
+      - $ref: '#/parameters/header_param_example'
+      - $ref: '#/parameters/standard_filter_body_param'
+      responses:
+        206:
+          description: Lista de expedientes obtenida
+          schema:
+            $ref: '#/definitions/expedientes_response' 
+          examples:
+            application/json:
+              result:
+                status: true
+                http_code: 206
+                trace_id: 12345abcde
+              metadata:
+                paging:
+                  init: 15
+                  limit: 5
+                  num_page: 3
+                  total: 35
+                  total_pages: 7
+                  links:
+                    self:
+                      href: '/expedientes?$init=15&amp;$limit=5'
+                    previous:
+                      href: '/expedientes?$init=10&amp;$limit=5'
+                    next:
+                      href: '/expedientes?$init=20&amp;$limit=5'
+                    first:
+                      href: '/expedientes?$init=0&amp;$limit=5'
+                    last:
+                      href: '/expedientes?$init=30&amp;$limit=5'
+              data:
+                expedientes:
+                  - id: 1
+                    titulo: 'Expediente 1'
+                    num_paginas: 10
+                    fecha_creacion: '1990-07-04'
+                    ultima_revision: '2021-03-21'
+                  - id: 2
+                    titulo: 'Expediente 2'
+                    num_paginas: 20
+                    fecha_creacion: '1999-12-24'
+                    ultima_revision: '2021-01-03'
+        400:
+          $ref: '#/responses/standard_bad_request_response'
+        401:
+          $ref: '#/responses/standard_unauthorized_response'
+        403:
+          $ref: '#/responses/standard_forbidden_response'
+        429:
+          $ref: '#/responses/standard_too_many_requests_response'
+        default:
+          $ref: '#/responses/standard_server_error_response'
+  /clientes/{uuid_cliente}/expedientes:
+    get:
+      summary: Obtención de la colección de expedientes de un cliente
+      description: | 
+        Permite obtener la colección de expedientes de un cliente mediante su UUID único.
+        Dicho UUID es un parámetro obligatorio en la URL.
+        Admite cabeceras y *query parameters*.
+      tags:
+      - expedientes (consultas)
+      parameters:
+      - $ref: '#/parameters/standard_init_param'
+      - $ref: '#/parameters/standard_limit_param'
+      - $ref: '#/parameters/standard_total_param'
+      - $ref: '#/parameters/standard_select_param'
+      - $ref: '#/parameters/standard_exclude_param'
+      - $ref: '#/parameters/standard_expand_param'
+      - $ref: '#/parameters/standard_order_by_param'
+      - $ref: '#/parameters/standard_trace_id_header_param'
+      - $ref: '#/parameters/uuid_cliente_param'
+      - $ref: '#/parameters/query_param_example'
+      - $ref: '#/parameters/header_param_example'
+      responses:
+        206:
+          description: Lista de expedientes obtenida
+          schema:
+            $ref: '#/definitions/expedientes_response' 
+          examples:
+            application/json:
+              result:
+                status: true
+                http_code: 206
+                trace_id: 12345abcde
+              metadata:
+                paging:
+                  init: 15
+                  limit: 5
+                  num_page: 3
+                  total: 35
+                  total_pages: 7
+                  links:
+                    self:
+                      href: '/clientes/336d343e-f35e-4d14-a4dd-d2257cbef526/expedientes?$init=15&amp;$limit=5'
+                    previous:
+                      href: '/clientes/336d343e-f35e-4d14-a4dd-d2257cbef526/expedientes?$init=10&amp;$limit=5'
+                    next:
+                      href: '/clientes/336d343e-f35e-4d14-a4dd-d2257cbef526/expedientes?$init=20&amp;$limit=5'
+                    first:
+                      href: '/clientes/336d343e-f35e-4d14-a4dd-d2257cbef526/expedientes?$init=0&amp;$limit=5'
+                    last:
+                      href: '/clientes/336d343e-f35e-4d14-a4dd-d2257cbef526/expedientes?$init=30&amp;$limit=5'
+              data:
+                expedientes:
+                  - id: 1
+                    titulo: 'Expediente 1'
+                    num_paginas: 10
+                    fecha_creacion: '1990-07-04'
+                    ultima_revision: '2021-03-21'
+                  - id: 2
+                    titulo: 'Expediente 2'
+                    num_paginas: 20
+                    fecha_creacion: '1999-12-24'
+                    ultima_revision: '2021-01-03'
+        400:
+          $ref: '#/responses/standard_bad_request_response'
+        401:
+          $ref: '#/responses/standard_unauthorized_response'
+        403:
+          $ref: '#/responses/standard_forbidden_response'
+        404:
+          $ref: '#/responses/standard_not_found_response'
+        429:
+          $ref: '#/responses/standard_too_many_requests_response'
+        default:
+          $ref: '#/responses/standard_server_error_response'
+  /expedientes/{id_expediente}/ficheros:
+    # Este es un ejemplo de cómo se deben especificar endpoints que permiten subida de ficheros
+    post:
+      summary: Inclusión de fichero de expediente
+      description: | 
+        Permite subir el fichero de un expediente concreto, mediante su identificador único.
+        Dicho identificador es un parámetro obligatorio en la URL.
+      tags:
+      - expedientes (modificación)
+      # Es necesario especificar el formato de entrada, ya que en este caso es diferente al resto de la API
+      # Por norma general, utilizaremos multipart/form-data para subida de ficheros
+      # En este formato de entrada, es posible adjuntar, no solo el fichero, sino también otras propiedades de diversos tipos:
+      # un objeto JSON, un string, un integer, etc. aunque no se especifique de manera concreta por las limitaciones de swagger
+      # En OpenAPI 2 (swagger) no es posible especificar todos los posibles formatos del fichero adjunto al formData
+      # Si quiere controlarse qué formatos se suben, deberá hacerse en el backend.
+      consumes:
+      - multipart/form-data
+      parameters:
+      - $ref: '#/parameters/standard_trace_id_header_param'
+      - $ref: '#/parameters/id_expediente_param'
+      - $ref: '#/parameters/fichero_form_data_param'
+      responses:
+        201:
+          description: Fichero de expediente subido correctamente
+          schema:
+            $ref: '#/definitions/expediente_response'
+          headers:
+            Location:
+              type: string
+              format: uri
+              description: URL del recurso recien creado
+          examples:
+            application/json:
+              result:
+                status: true
+                http_code: 200
+                trace_id: 12345abcde
+              data:
+                id: 1
+                titulo: 'Expediente 1'
+        400:
+          $ref: '#/responses/standard_bad_request_response'
+        401:
+          $ref: '#/responses/standard_unauthorized_response'
+        403:
+          $ref: '#/responses/standard_forbidden_response'
+        404:
+          $ref: '#/responses/standard_not_found_response'
+        429:
+          $ref: '#/responses/standard_too_many_requests_response'
+        default:
+          $ref: '#/responses/standard_server_error_response'
+  /expedientes/{id_expediente}/ficheros/{id_fichero}:
+    # Este es un ejemplo de cómo se deben especificar endpoints de descarga de ficheros
+    get:
+      summary: Obtención de un fichero de expediente por su id
+      description: | 
+        Permite obtener un fichero de expediente mediante sus identificadores únicos.
+        Dichos identificadores son parámetros obligatorios en la URL.
+      tags:
+      - expedientes (consultas)
+      # Es necesario especificar el formato de respuesta (salida), ya que en este caso es diferente al resto de la API
+      # Se pueden especificar varios, como se muestra a continuación
+      produces:
+      - application/pdf # .pdf
+      - application/msword # .doc .dot
+      - application/vnd.openxmlformats-officedocument.wordprocessingml.document # .docx
+      - application/vnd.ms-excel # .xls .xlt .xla
+      - application/vnd.openxmlformats-officedocument.spreadsheetml.sheet # .xlsx
+      - application/vnd.ms-powerpoint # .ppt .pot .pps .ppa
+      - application/vnd.openxmlformats-officedocument.presentationml.presentation # .pptx
+      - application/vnd.ms-access # .mdb
+      parameters:
+      - $ref: '#/parameters/standard_trace_id_header_param'
+      - $ref: '#/parameters/id_expediente_param'
+      - $ref: '#/parameters/id_fichero_param'
+      responses:
+        200:
+          description: Expediente encontrado y fichero obtenido correctamente
+          # Aquí simplemente definimos que se trata de un fichero
+          # El formato debe indicarse en el apartado 'produces' como se explica arriba
+          # No es posible incluir un ejemplo para este tipo de respuesta
+          schema:
+            type: file
+        400:
+          $ref: '#/responses/standard_bad_request_response'
+        401:
+          $ref: '#/responses/standard_unauthorized_response'
+        403:
+          $ref: '#/responses/standard_forbidden_response'
+        404:
+          $ref: '#/responses/standard_not_found_response'
+        429:
+          $ref: '#/responses/standard_too_many_requests_response'
+        default:
+          $ref: '#/responses/standard_server_error_response'
+  # Recurso de implementación obligatoria para monitorización de la API
+  # El recurso definido aquí es una propuesta de cómo debería implementarse.
+  # No obstante dicha implementación dependerá de los sistemas usados por la API.
+  # En cualquier caso debe ajustarse la definición a la implementación final,
+  # siendo conveniente definir la misma antes de llevarla a cabo.
+  /status:
+    get:
+      summary: Endpoint de monitorización de la API
+      description: | 
+        Propuesta de definición de la respuesta que debería ofrecer el endpoint de monitorización previsto en el estándar.
+        Se subdivide en comprobación de infraestructura y comprobación funcional. En la de infraestructura se especifican Los
+        sistemas probados y el estado de los mismos. En la funcional se deben hacer algunas llamadas a métodos GET de la API y 
+        especificar el código de estado HTTP que devuelven. Idealmente deben responder con códigos 2xx o 4xx. Los códigos 5xx
+        deben setear el campo status del objeto result a _false_
+      tags:
+      - monitorización
+      parameters:
+      - $ref: '#/parameters/standard_trace_id_header_param'
+      responses:
+        200:
+          description: Estado correcto de la aplicación
+          schema: 
+            $ref: '#/definitions/standard_status_endpoint_response'
+          examples:
+            application/json:
+              result:
+                status: true
+                http_code: 200
+                info: Solicitud realizada con éxito
+                trace_id: 12345abcde
+              data:
+                current_date_time: "2022-05-11T13:44:33+0200"
+                app_version: "1.2.0 japi_rest_ejemplo_alumnos"
+                app_build_date_time: "2022-05-03T18:22:24+0200"
+                frw_version: "JAPI 1.2.0"
+                systems:
+                  - system: "BBDD"
+                    status: true
+                  - system: "JWKS de WSO2"
+                    status: true
+        400:
+          $ref: '#/responses/standard_bad_request_response'
+        401:
+          $ref: '#/responses/standard_unauthorized_response'
+        403:
+          $ref: '#/responses/standard_forbidden_response'
+        default:
+          $ref: '#/responses/standard_server_error_response'
+securityDefinitions:
+  #########################################################################
+  # ----- Definiciones de seguridad empleadas en algunos endpoints -----  #
+  #########################################################################
+  #
+  # Mecanismo de seguridad por defecto.
+  # Como únicamente se va a emplear para definir scopes, va a ser el único modelo de este apartado.
+  # IMPORTANTE: deberá eliminarse en caso de que ningún endpoint de la API cuente con scopes.
+  default:
+    # Únicamente se debe modificar el objeto 'scopes'
+    type: oauth2
+    authorizationUrl: 'https://test.com'
+    flow: implicit
+    scopes:
+      # Objeto contenedor de todos los scopes declarados en cualquier endpoint de esta API.
+      # Se forman mediante el nombre del scope y una pequeña descripción del mismo.
+      PINT_SC_CONSULTA: Scope con permiso para la consulta de clientes.
+      PINT_SC_GESTOR: Scope con permisos de gestoría. Por ejemplo, la creación de un cliente nuevo.
+      PINT_SC_ADMINISTRADOR: Scope con permisos de administrador. Por ejemplo, la creación de un cliente nuevo.
+definitions:
+  #########################################################################
+  # --- Definiciones estándar que no se pueden modificar ni eliminar ---  #
+  #########################################################################
+  #
+  # Objeto result que tienen que devolver todos los recursos, correctos o incorrectos.
+  # Los campos que SIEMPRE se devolverán en este objeto son status, http_code y trace_id.
+  # El uso del resto de campos está descrito brevemente en sus propias descripciones, pero debe
+  # consultarse el estándar de definición de APIs de MD para más información.
+  standard_response_result:
+    properties:
+      result:
+        type: object
+        properties:
+          status:
+            type: boolean
+            description: Resultado de éxito o error de la operación
+            example: true
+          http_code:
+            type: integer
+            format: int32
+            description: Código http de la respuesta.
+            example: 200
+          info:
+            type: string
+            description: Breve mensaje indicando si la operación fue exitosa o no.
+            example: Solicitud realizada con éxito.
+          errors:
+            type: array
+            description: Array de errores. Opcional. Se usará cuando se haya producido al menos un error, pudiéndose especificar tódos los que se hayan producido.
+            items:
+              $ref: '#/definitions/standard_error'
+          stack_trace:
+            type: array
+            description: Array que recoge los errores en caso de que sea necesario facilitar la depuración. Solo se incluirá en el entorno de desarrollo.
+            items:
+              type: object
+              properties: 
+                method_name:
+                  type: string
+                  description: Método
+                  example: 'readJavaType'
+                file_name:
+                  type: string
+                  description: Nombre del archivo
+                  example: 'archivo.java'
+                line_number:
+                  type: integer
+                  format: int32
+                  description: Número de línea
+                  example: 36
+                class_name:
+                  type: string
+                  description: Clase
+                  example: 'org.springframework.http.converter.json.AbstractJackson2HttpMessageConverter'
+                native_method:
+                  type: boolean
+                  description: Método nativo
+                  example: false
+          trace_id:
+            type: string
+            description: Identificador de la petición en el sistema de logging para facilitar la depuración de errores. Contenido de la cabecera x-trace-id.
+            example: b8240028-8df4-4019-8b03-182a0a9bc88d
+          updated_elements:
+            type: integer
+            format: int32
+            description: Número de elementos borrados o modificados cuando se reciben llamadas con métodos PUT o DELETE sobre varios recursos. Obligatorio para borrados lógicos.
+            example: 0
+        required:
+        - status
+        - http_code
+        - trace_id
+  #
+  # Este objeto se usa en respuestas paginadas. Está incluido en el modelo de respuesta estándar con metadatos
+  # standard_response_with_metadata, por lo que no es necesario referenciarlo directamente.
+  standard_response_metadata:
+    properties:
+      metadata:
+        type: object
+        properties:
+          paging:
+            $ref: '#/definitions/standard_paging'
+  #
+  # Respuesta estándar cuando un recurso devuelve un solo elemento
+  # Debe usarse en los recursos que consultan o modifican un recurso por su identificador.
+  # También debe usarse en las respuestas de error aunque no devuelvan datos del recurso.
+  # En esta plantilla dichas respuestas son reutilizables y ya referencian este modelo.
+  standard_response:
+    allOf:
+      - $ref: '#/definitions/standard_response_result'
+    required:
+    - result
+  #
+  # Respuesta estándar cuando un recurso devuelve una lista de elementos
+  # Debe usarse en los recursos que devuelven listados paginados cumplimentando el objeto metadata.
+  # En los errores se aplica la misma política que en los endpoints que devuelven un solo recurso.
+  standard_response_with_metadata:
+    allOf:
+      - $ref: '#/definitions/standard_response_result'
+      - $ref: '#/definitions/standard_response_metadata'
+    required:
+      - result
+  #
+  # Respuesta estándar para el endpoint /status, OBLIGATORIO en todas las APIs definidas bajo el estándar de MD.
+  standard_status_endpoint_response:
+    allOf:
+      - $ref: '#/definitions/standard_response'
+    properties:
+      data:
+        type: object
+        description: Comprobaciones realizadas cuando se recibe la llamada al endpoint de status
+        properties:
+          current_date_time:
+            type: string
+            format: date-time
+            description: Fecha actual del servidor. Se usa para comprobar si el recurso se cachea 
+            example: "2022-05-11T13:44:33+0200"
+          app_version:
+            type: string
+            description: Versión y nombre de la aplicación 
+            example: "1.2.0 japi_rest_ejemplo_alumnos"       
+          app_build_date_time:
+            type: string
+            format: date-time
+            description: Fecha de compilación de la aplicacion (del jar) 
+            example: "2022-05-03T18:22:24+0200"       
+          frw_version:
+            type: string
+            description: Versión del framework usado
+            example: "JAPI 1.2.0"             
+          systems:
+            type: array
+            description: Array de sistemas comprobados y resultados.
+            items:
+              $ref: '#/definitions/standard_status_endpoint_system_object'
+  #
+  # Modelo de error estándar a usar cuando se rellena el array de errores.
+  # Ya está referenciado en la respuesta estándar.
+  standard_error:
+    type: object
+    properties:
+      code:
+        type: integer
+        format: int32
+        description: Codigo de error devuelto por la API. Se especificarán códigos de errores controlados. En el caso de errores no controlados se especificará si es posible. De lo contrario se deberá indicar un código 500.
+        example: 1003
+      message:
+        type: string
+        description: Descripción textual del error devuelto
+        example: Atributo con valor superior al máximo
+    required:
+    - code
+    - message
+  #
+  # Modelo de paginación usado en la respuesta estándar con metadatos.  
+  standard_paging:
+    type: object
+    description: Objeto a devolver en caso de que se devuelva una respuesta paginada. Los datos irán en el campo 'data', la información sobre paginación se incluirá en este objeto.
+    properties:
+      init:
+        type: integer
+        format: int32
+        description: Registro inicial de la página.
+        example: 3
+      limit:
+        type: integer
+        format: int32
+        description: Tamaño de página.
+        example: 5
+      total:
+        type: integer
+        format: int32
+        description: Número total de registros.
+        example: 35
+      num_page:
+        type: integer
+        format: int32
+        description: Número de la página actual.
+        example: 2
+      total_pages:
+        type: integer
+        format: int32
+        description: Número total de páginas.
+        example: 7
+      links:
+        type: object
+        properties:
+          self:
+            description: Enlace a la propia página devuelta.
+            allOf:
+              - $ref: '#/definitions/standard_paging_link'
+          previous:
+            description: Enlace a la página previa
+            allOf:
+              - $ref: '#/definitions/standard_paging_link'
+          next:
+            description: Enlace a la página siguiente.
+            allOf:
+              - $ref: '#/definitions/standard_paging_link'
+          first:
+            description: Enlace a la primera página.
+            allOf:
+              - $ref: '#/definitions/standard_paging_link'
+          last:
+            description: Enlace a la última página.
+            allOf:
+              - $ref: '#/definitions/standard_paging_link'
+        required:
+          - previous
+          - next
+    required:
+      - init
+      - limit
+      - links
+  #
+  # Modelo de enlace referenciado en el modelo de paginación
+  standard_paging_link:
+    type: object
+    properties:
+      href:
+        type: string
+        description: Enlace codificado en html.
+        example: https://apis.comunidad.madrid/ciencia-tecnologia/test-api/v1/resources?$init=15&amp;$limit=5
+  #
+  # Modelo de objeto de sistema para el endpoint de monitorización
+  standard_status_endpoint_system_object:
+    type: object
+    properties:
+      system:
+        type: string
+        description: Nombre del sistema probado
+        example: Database
+      status:
+        type: boolean
+        description: Estado del sistema probado
+        example: true
+  #
+  # Modelo de valor de objeto de filtrado
+  standard_filter_value:
+    type: object
+    description: Par clave-valor que indica un criterio para realizar el filtrado.
+    properties:
+      property: 
+        type: string
+        description: Nombre de la propiedad (columna de BBDD)
+        example: property_1
+      prop_type:
+        type: string
+        description: Tipo de dato
+        enum: [STRING, INTEGER, FLOAT, DATE, DATETIME, BOOLEAN]
+        example: STRING
+      prop_value:
+        type: string
+        description: Valor de la propiedad.
+        example: value_1
+      prop_values:
+        type: array
+        items:
+          type: string
+        description: Array de valores a usar como rango
+      $filter:
+        $ref: '#/definitions/standard_filter_object_base'
+  #
+  # Modelo de objeto de filtrado
+  standard_filter_object:
+    type: object
+    description: |
+      Parámetro que indica los criterios para una consulta compleja.
+      Permite realizar operaciones AND, OR, mayor o igual, substring, like, etc
+    properties:
+      operation:
+        type: string
+        description: Operación a realizar
+        example: LT
+        enum:
+          - AND
+          - OR
+          - GT
+          - LT
+          - GTEQ
+          - LTEQ
+          - EQ
+          - NEQ
+          - IN
+          - BETWEEN
+          - SUBSTRING
+          - LIKE
+          - ILIKE
+          - NLIKE
+          - REGEXP
+      values:
+        type: array
+        items:
+          $ref: '#/definitions/standard_filter_value'
+  standard_filter_object_base:
+    type: object
+    description: |
+      Este objeto permite anidar (concatenar) filtros para realizar consultas más complejas.
+      Su implementación es la misma que se refleja en la definición de standard_filter_object.
+    properties:
+      operation:
+        type: string
+        description: Operación a realizar
+        example: LT
+        enum:
+          - AND
+          - OR
+          - GT
+          - LT
+          - GTEQ
+          - LTEQ
+          - EQ
+          - NEQ
+          - IN
+          - BETWEEN
+          - SUBSTRING
+          - LIKE
+          - ILIKE
+          - NLIKE
+          - REGEXP
+      values:
+        type: array
+        items:
+          type: string
+          description: | 
+            Este objeto es el mismo que se refleja en la definición de standard_filter_value. 
+            Permite concatenar valores para el filtro. Su tipo es el mismo que dicho objeto, 
+            aunque aquí esté definido como string para evitar referencias circulares.
+  #
+  # Recurso de ejemplo para ver todos los tipos de propiedades
+  # IMPORTANTE: eliminar una vez definidos los recursos propios de la API
+  recurso_de_ejemplo:
+    type: object
+    description: Recurso de ejemplo para ver todos los tipos de propiedades
+    properties:
+      integer_data:
+        type: integer
+        format: int32
+        description: Datos de tipo entero
+        minimum: 0
+        maximum: 100
+        example: 1
+      number_data:
+        type: number
+        format: float
+        description: Parámetros de tipo number
+        example: 0.0
+      date_data:
+        type: string
+        format: date
+        description: Datos de tipo fecha ISO 8061
+        example: "yyyy-MM-dd"
+      date_time_data:
+        type: string
+        format: date-time
+        description: Datos de tipo fecha y hora ISO 8061
+        example: "yyyy-MM-ddThh:mm:ssZ+hh:00"
+      string_data:
+        type: string
+        maxLength: 100
+        description: Datos de tipo texto
+        example: Datos de tipo texto
+      boolean_data:
+        type: boolean
+        description: Datos de tipo boolean
+        example: true
+      binary_data:
+        type: string
+        format: binary
+        # En este caso no es posible especificar un ejemplo
+      base64_data:
+        type: string
+        format: byte
+        example: U3dhZ2dlciByb2Nrcw==
+      array_data:
+        type: array
+        minItems: 1
+        maxItems: 100
+        items:
+          type: object
+          properties:
+            property_1:
+              type: string
+              example: value_1
+            property_n:
+              type: string
+              example: value_n
+          description: Datos del mismo tipo dentro de un array. Puede ser cualquiera de los tipos primitivos u otro objeto
+      enum_data:
+        type: string
+        description: |
+          Datos con un rango de valores determinado
+          * S - Si
+          * N - No
+        enum:
+          - S
+          - N
+        example: S
+      object_data:
+        type: object
+        description: Datos de tipo objeto
+        properties: 
+          property_1:
+            type: integer
+            format: int32
+            example: 1
+          property_2:
+            type: object
+            description: Objeto anidado en otro
+            properties:
+              nested_prop_1:
+                type: string
+                example: "Example1"
+              nested_prop_2:
+                type: string
+                example: "Example2"
+              nested_prop_3:
+                type: boolean
+                example: false
+      ref_object_data:
+        $ref: '#/definitions/recurso_ejemplo_referenciado'
+  #
+  # Recurso de ejemplo de subobjeto referenciado
+  # IMPORTANTE: eliminar una vez definidos los recursos propios de la API
+  recurso_ejemplo_referenciado:
+    type: object
+    description: Objeto referenciado desde una propiedad de otro objeto mediante $ref
+    properties:
+      property_1:
+        type: integer
+        format: int32
+        example: 1
+      property_2:
+        type: number
+        format: float
+        example: 1.2
+  #
+  # Respuesta para cualquier endpoint de eliminación múltiple de recursos
+  standard_multi_delete_response:
+    description: Respuesta estándar cuando se borran varios recursos
+    allOf:
+      - $ref: '#/definitions/standard_response'
+    properties:
+      data:
+        type: object
+        properties:
+          deleted_elements:
+            type: array
+            items:
+              type: string
+            description: Array de identificadores de recursos eliminados
+            example:
+              - "123"
+              - "234"
+  #
+  ######################################################################
+  #              --- Definiciones propias de la API -----              #
+  ######################################################################
+  #                                                                    #
+  # A partir de aquí empiezan las definiciones particulares de la API  #
+  #                                                                    #
+  # Para cada recurso estará bien definir el objeto u objetos que      #
+  # representan el recurso o las distinas formas de ver el recurso     #
+  # (Ej. cliente)                                                      #
+  #                                                                    #
+  # Se definirán también las respuestas en las que se devuelve         #
+  # el recurso o una lista del recurso que se esté implementando       #
+  #    Si hay respuestas que no devuelven el recurso completo sino     #
+  #    parte, se creará un definición específica para esa respuesta    #
+  #    con la nomemclatura: <método http><nombre recurso>_response     #
+  #    Ej: post_cliente_response                                       #
+  #                                                                    #
+  # Los parámetros de los recursos van en la sección 'parameters':     #
+  ######################################################################
+  #
+  cliente:
+    type: object
+    properties:
+      id:
+        type: integer
+        format: int32
+        description: Identificador único del cliente        
+        example: 27
+      nombre:
+        type: string
+        maxLength: 50
+        description: Nombre del cliente        
+        example: 'Antonio'
+      edad:
+        type: integer
+        format: int32
+        minimum: 0
+        maximum: 120
+        description: Edad del cliente
+        example: 20
+      fecha_nacimiento:
+        type: string
+        format: date
+        description: Fecha de nacimiento. Fecha ISO 8061 en formato yyyy-MM-dd
+        example: "1980-06-25"
+      fecha_hora_alta:
+        type: string
+        format: date-time
+        description: Fecha de alta en el sistema. Fecha y hora ISO 8061 en formato yyyy-MM-ddyyyy-MM-ddThh:mm:ssZ+hh:00
+        example: "2019-01-25T23:55:33+01:00"    
+      tipo_cliente:
+        type: string
+        enum:
+          - 'N'
+          - S
+          - A
+        example: 'N'
+        description: >
+          Tipo de cliente:
+            * N - Normal
+            * S - Solo consulta
+            * A - Administrador     
+      baja:
+        type: boolean
+        description: Indica si el cliente fue dado de baja
+        example: false
+  #
+  expediente:
+    type: object
+    properties:
+      id:
+        type: integer
+        format: int32
+        description: Identificador único del expediente        
+        example: 10
+      titulo:
+        type: string
+        maxLength: 60
+        description: Titulo del expediente
+        example: 'Expediente 1'
+      num_paginas:
+        type: integer
+        format: int32
+        minimum: 0
+        description: Número de páginas del expediente
+        example: 20
+      fecha_creacion:
+        type: string
+        format: date
+        description: Fecha de creación. Fecha ISO 8061 en formato yyyy-MM-dd
+        example: "1980-06-25"
+      ultima_revision:
+        type: string
+        format: date
+        description: Fecha de última revisión. Fecha y hora ISO 8061 en formato yyyy-MM-dd
+        example: "2019-01-25"
+  #
+  # Respuesta de un cliente
+  # Se usa en todas las respuestas que devuelvan un cliente concreto
+  # POST /clientes/get
+  # GET /clientes/{uuid_cliente}
+  # POST /clientes
+  # PUT /clientes/{uuid_cliente}
+  cliente_response:
+    # IMPORTANTE: Utilizar el 'allOf' de la siguiente manera: como un array de referencias a otros modelos de los cuales
+    #   obtener todas sus propiedades. Nunca definir directamente un modelo como elemento del array, puesto que eso puede
+    #   ocasionar problemas a la hora de resolver referencias. En caso de necesitar propiedades adicionales, añadirlas con
+    #   el 'properties' a la misma altura que el 'allOf', tal y como se realiza en todos los modelos que lo emplean.
+    allOf:
+      - $ref: '#/definitions/standard_response'
+    properties:
+      data:
+        $ref: '#/definitions/cliente'
+  #
+  # Respuesta parcial de un cliente
+  # Se usa en la respuesta que devuelve un cliente recién creado
+  # POST /clientes
+  post_cliente_response:
+    allOf:
+      - $ref: '#/definitions/standard_response'
+    properties:
+      data:
+        type: object
+        properties: 
+          id:
+            type: integer
+            format: int32
+            description: Identificador único del cliente        
+            example: 27
+          nombre:
+            type: string
+            maxLength: 50
+            description: Nombre del cliente        
+            example: 'Antonio'
+  # IMPORTANTE: Como se menciona en la nota al inicio de este bloque, si se devuelve una respuesta
+  # que contiene datos parciales o distintos a los de la definición del recurso, se definirá una nueva
+  # respuesta que comience por el verbo http al que responderá. Por ejemplo, si en un POST sólo se
+  # devuelve el id del recurso en lugar de todos los campos del mismo, se definirá una respuesta
+  # 'post_cliente_response' con el siguiente aspecto:
+  #
+  # post_cliente_response:
+  #   allOf:
+  #     - $ref: '#/definitions/standard_response_result'
+  #   properties:
+  #     data:
+  #       type: object
+  #       properties:
+  #         id:
+  #           type: integer
+  #           format: int32
+  #
+  #
+  # Respuesta de una lista de clientes
+  # Se usa en todas las respuestas que devuelvan varios clientes
+  # Si es un listado paginado debe incluir metadatos de paginación.
+  # GET /clientes
+  clientes_response:
+    allOf:
+      - $ref: '#/definitions/standard_response_with_metadata'
+    properties:
+      data:
+        type: object
+        properties:
+          clientes:
+            type: array
+            items:
+              $ref: '#/definitions/cliente'
+  #
+  # Respuesta de un cliente
+  # Se usa en todas las respuestas que devuelvan un cliente concreto
+  # POST /clientes/get
+  # GET /clientes/{uuid_cliente}
+  # POST /clientes
+  # PUT /clientes/{uuid_cliente}
+  expediente_response:
+    allOf:
+      - $ref: '#/definitions/standard_response'
+    properties:
+      data:
+        $ref: '#/definitions/expediente'
+  #
+  # Respuesta de una lista de expedientes
+  # Se usa en todas las respuestas que devuelvan varios expedientes
+  # Si es un listado paginado debe incluir metadatos de paginación.
+  # POST /expedientes/get
+  expedientes_response:
+    allOf:
+      - $ref: '#/definitions/standard_response_with_metadata'
+    properties:
+      data:
+        type: object
+        properties:
+          expedientes:
+            type: array
+            items:
+              $ref: '#/definitions/expediente'
+  #
+  ######################################################################
+  #       --- Parámetros estándar (NO ELIMINAR NI MODIFICAR) ---       #
+  ######################################################################
+  #
+parameters:
+  #
+  # Parámetro indicador del registro inicial para listados paginados.
+  standard_init_param:
+    in: query
+    name: $init
+    type: integer
+    format: int32
+    minimum: 0
+    description: | 
+      Registro inicial deseado
+    default: 0
+  #  
+  # Parámetro indicador del máximo de registros a devolver en un listado paginado.
+  standard_limit_param:
+    in: query
+    name: $limit
+    type: integer
+    format: int32
+    minimum: 1
+    description: | 
+      Número máximo de registros a mostrar por página
+    default: 25
+  #
+  # Parámetro indicador del cálculo de totales.
+  standard_total_param:
+    in: query
+    name: $total
+    type: boolean
+    description: | 
+      Indica si se deben calcular y devolver los atributos _total_ y _total_pages_ en el objeto _metadata.paging_ de la respuesta estándar.
+    default: false
+  #  
+  # Parámetro indicador de atributos a mostrar en la respuesta.
+  standard_select_param:
+    in: query
+    name: $select
+    type: array
+    minItems: 1
+    maxItems: 100
+    items:
+      type: string
+    description: | 
+      Permite seleccionar los atributos del recurso que se desean obtener en la consulta.
+      Se recomienda su uso cuando sólo se desea obtener unos pocos atributos de un recurso complejo.
+      Puede especificarse como un array de atributos. Ver estándar de definición de APIs.
+  #
+  # Parámetro indicador de atributos a excluir de la respuesta.
+  standard_exclude_param:
+    in: query
+    name: $exclude
+    type: array
+    items:
+      type: string
+    minItems: 1
+    maxItems: 100
+    description: |
+      Permite excluir determinados atributos del recurso. 
+      Se recomienda su uso cuando se desea excluir algunos atributos de un recurso complejo.
+      Puede especificarse como un array de atributos. Ver estándar de definición de APIs.
+  #  
+  # Parámetro indicador de subatributos a expandir.
+  standard_expand_param:
+    in: query
+    name: $expand
+    type: array
+    minItems: 1
+    maxItems: 100
+    items:
+      type: string
+    description: |  
+      Indica una lista de subatributos que se desea expandir.
+      Puede especificarse como un array de atributos. Ver estándar de definición de APIs.
+  #
+  # Parámetro de criterio de ordenación para listados paginados.
+  standard_order_by_param:
+    in: query
+    name: $orderby
+    type: array
+    minItems: 1
+    maxItems: 100
+    items:
+      type: string
+    description: |
+      Permite indicar los criterios de ordenación de una consulta. 
+      El formato a utilizar será un signo + ó - para indicar si es 
+      ascendente o descendente seguido del nombre de la columna o campo por el que se ordena.
+  #
+  # Parámetro de consulta de filtrado complejo.
+  # Se debe utilizar mediante una petición de caso especial POST como GET.
+  standard_filter_body_param:
+    in: body
+    name: $filter
+    description: Ejemplo de consulta compleja pasada en el body de la petición.
+    required: false
+    schema:
+      type: object
+      properties: 
+        $filter:
+          $ref: '#/definitions/standard_filter_object'   
+      example:
+        "$filter": {
+          "operation": "EQ",
+          "values": [
+            {
+              "property": "property_1",
+              "prop_type": "INTEGER",
+              "prop_value": "7"
+            }
+          ]
+        }
+  #
+  # Cabecera obligatoria de rastreo de petición.
+  standard_trace_id_header_param:
+    in: header
+    name: x-trace-id
+    type: string
+    maxLength: 100
+    description: |
+      Cabecera indicando el id de traceo de la petición. 
+      Debe ser una cadena aleatoria basada en timestamp.
+    required: true
+  #
+  ####################################################################
+  #              --- Parámetros propios de la API -----              #
+  ####################################################################
+  #                                                                  #
+  # A partir de aquí comienzan los parámetros particulares de la API #
+  #                                                                  #
+  #  Para los parámetros de los métodos POST y PUT se debe crear     #
+  #  una definición con la nomenclatura                              #
+  #       <método http><nombre recurso>_body_param                   #
+  #       Ej: post_cliente_body_param                                #
+  #                                                                  #
+  # Las definiciones de los recursos van en la sección definitions.  #
+  # Las respuestas a devolver van en la sección responses.           #
+  #                                                                  #
+  ####################################################################
+  #
+  # Esto es un ejemplo de paso de parámetro por la query.
+  # IMPORTANTE: eliminar cuando se hayan definido los parámetros particulares de la API
+  query_param_example:
+    in: query
+    name: query_param_example
+    type: string
+    description: | 
+      Ejemplo de query parameters particulares de cada endpoint.
+      Pueden ser de cualquier tipo: fecha, número, string, etc
+  #
+  # Esto es un ejemplo de parámetro de cabecera HTTP. 
+  # IMPORTANTE: eliminar cuando se hayan definido los parámetros particulares de la API
+  header_param_example:
+    in: header
+    name: header_param_example
+    type: string
+    description: |
+      Ejemplo de cabeceras particulares de cada endpoint.
+  #
+  # Esto es un ejemplo de paso de parámetros en el cuerpo de la petición.
+  # Se usará cuando se deban pasar gran cantidad de parámetros o estos sean de naturaleza sensible,
+  # mediante una petición de caso especial POST como GET.
+  # IMPORTANTE: eliminar cuando se hayan definido los parámetros particulares de la API
+  body_param_example:
+    in: body
+    name: body_param_example
+    description: Ejemplo de parámetro sensible pasado en el body de la petición.
+    schema:
+      type: object
+      properties:
+        nif:
+          type: string
+          maxLength: 9
+          description: Documento de identidad
+          example: '00000000A'
+  #
+  # Ejemplo de cuerpo de petición que contiene los identificadores 
+  # de recursos a eliminar en una operación de borrado múltiple.
+  # IMPORTANTE: Eliminar si no se usa por no implementarse la operación.
+  delete_multiple_body_param_example:
+    in: body
+    name: delete_multiple_body_param_example
+    description: | 
+      Ejemplo de cuerpo de petición con listado de ids de recursos a eliminar.
+      Se debe usar en los endpoints de borrado masivo. Su definición es un ejemplo, dado que los identificadores pueden ser de distinto tipo. 
+      La definición de este cuerpo dependerá del recurso.
+    required: true
+    schema:
+      type: object
+      properties: 
+        data:
+          type: array
+          items: 
+            type: object
+            properties: 
+              id:
+                type: integer
+                format: int32
+                description: Identificador del recurso
+                example: 123
+          description: Array con los identificadores de los recursos a eliminar.
+          example:
+            - id: 123
+            - id: 234
+  #
+  # parametro id del cliente que se usa en
+  # - GET /clientes/{uuid}
+  # - PUT /clientes/{uuid}
+  # - DELETE /clientes/{uuid}
+  uuid_cliente_param:
+    in: path
+    name: uuid_cliente
+    type: string
+    format: uuid
+    description: UUID del cliente a obtener.
+    required: true
+  #
+  # parametro id del expediente que se usa en
+  # - GET /expedientes/{id}
+  # - GET /expedientes/{id}/ficheros/{id}
+  id_expediente_param:
+    in: path
+    name: id_expediente
+    type: string    
+    description: Identificador del expediente a obtener.
+    required: true
+  #
+  # parametro id del expediente que se usa en
+  # - GET /expedientes/{id}/ficheros/{id}
+  id_fichero_param:
+    in: path
+    name: id_fichero
+    type: string    
+    description: Identificador del fichero a obtener.
+    required: true
+  #
+  # parametro de tipo fichero que se usa en
+  # - POST /expedientes/{id}
+  fichero_form_data_param:
+    in: formData
+    name: fichero_form_data_param
+    type: file
+    description: Archivo de expediente a subir
+    required: true
+  #
+  # En este ejemplo se han quitado del recurso cliente las propiedades
+  # id, edad y baja porque son variables generadas
+  # que no se mandan al dar de alta o modificar
+  # Se usa en 
+  # - POST /clientes
+  # Se especificará al menos una propiedad obligatoria para no permitir la creación de recursos vacíos.
+  post_cliente_body_param:
+    in: body
+    name: post_cliente_body_param
+    required: true
+    description: Propiedades necesarias para crear un cliente (no incluye variables derivadas)
+    schema:
+      properties:       
+        nombre:
+          type: string
+          maxLength: 50
+          description: Nombre del cliente        
+          example: 'Antonio'
+        fecha_nacimiento:
+          type: string
+          format: date
+          description: Fecha de nacimiento. Fecha ISO 8061 en formato yyyy-MM-dd
+          example: "1980-06-25"  
+        tipo_cliente:
+          type: string
+          enum:
+          - N
+          - S
+          - A
+          example: N
+          description: >
+            Tipo de cliente:
+              * N - Normal
+              * S - Solo consulta
+              * A - Administrador    
+      required:
+        - nombre
+        - fecha_nacimiento
+  #              
+  # En los cuerpos de peticiones con verbo PUT ninguna property debe ser obligatoria.
+  # Se usa en 
+  # - PUT /clientes/{uuid}
+  # La recepción de un cuerpo vacío debe dar como respuesta un código http 400, pero 
+  # no se pueden especificar propiedades obligatorias dado que no es posible saber a priori
+  # cuáles de ellas se enviarán para su modificación. 
+  put_cliente_body_param:
+    in: body
+    name: put_cliente_body_param
+    description: Propiedades a modificar de un cliente (no incluye variables derivadas)
+    schema:
+      properties:       
+        nombre:
+          type: string
+          maxLength: 50
+          description: Nombre del cliente        
+          example: 'Antonio'
+        fecha_nacimiento:
+          type: string
+          format: date
+          description: Fecha de nacimiento. Fecha ISO 8061 en formato yyyy-MM-dd
+          example: "1980-06-25"  
+        tipo_cliente:
+          type: string
+          enum:
+          - N
+          - S
+          - A
+          example: N
+          description: >
+            Tipo de cliente:
+              * N - Normal
+              * S - Solo consulta
+              * A - Administrador 
+        baja:
+          type: boolean
+          example: false
+    required: true
+#
+######################################################################
+#     ----- Respuestas estándar (NO ELIMINAR NI MODIFICAR) -----     #
+######################################################################
+#
+responses:
+  # Respuesta para cualquier endpoint de eliminación de recurso individual
+  standard_delete_response:
+    description: Respuesta estándar cuando se borra un recurso
+    schema:
+      allOf:
+        - $ref: '#/definitions/standard_response'
+      properties:
+        data:
+          type: object
+          properties:
+            id:
+              type: integer
+              format: int32
+              description: id del recurso eliminado
+              example: 1234
+    examples:
+      application/json:
+        result:
+          status: true
+          http_code: 200
+          info: 'Solicitud realizada con éxito'
+          trace_id: 123456abcde
+        data:
+          id: 12
+  #
+  # Respuesta para peticiones incorrectas por parte del cliente (parámetros ausentes, erróneos, etc.)
+  standard_bad_request_response:
+    description: Bad request
+    schema:
+      $ref: '#/definitions/standard_response'
+    examples:
+      application/json:
+        result:
+          status: false
+          http_code: 400
+          info: 'Parámetros incorrectos'
+          trace_id: 123456abcde
+          errors:
+          - code: 1000
+            message: El atributo '%s' no puede contener un valor nulo
+          - code: 1005
+            message: El contenido del atributo '%s' ha de seguir el formato ISO 8601 para fechas sin hora
+  #
+  # Respuesta para peticiones en las que el backend autentica al cliente y este no tiene acceso al mismo.                      
+  standard_unauthorized_response:
+    description: Unauthorized
+    schema:
+      $ref: '#/definitions/standard_response'
+    examples:
+      application/json:
+        result:
+          status: false
+          http_code: 401
+          info: 'No autorizado'
+          trace_id: 123456abcde
+  #
+  # Respuesta para peticiones en las que el backend autentica al cliente, 
+  # este si tiene acceso a la API pero no al recurso invocado.          
+  standard_forbidden_response:  
+    description: Forbidden
+    schema:
+      $ref: '#/definitions/standard_response'
+    examples:
+      application/json:
+        result:
+          status: false
+          http_code: 403
+          info: 'Recurso prohibido'
+          trace_id: 123456abcde
+  #
+  # Respuesta para peticiones en las que no se ha encontrado el recurso solicitado.          
+  standard_not_found_response:
+    description: Not Found
+    schema:
+      $ref: '#/definitions/standard_response'
+    examples:
+      application/json:
+        result:
+          status: false
+          http_code: 404
+          info: 'Recurso no encontrado'
+          trace_id: 123456abcde
+          errors:
+          - code: 1104
+            message: 'No se ha encontrado ningún elemento con el identificador proporcionado. Por favor, revise: %s'
+  #
+  # Respuesta a devolver en caso de que el backend controle la cuota máxima de peticiones
+  # y esta se haya rebasado. 
+  # Por norma general será el API manager el que lo gestione y esta respuesta no será necesaria.
+  standard_too_many_requests_response:
+    description: Too many requests
+    schema:
+      $ref: '#/definitions/standard_response'
+    examples:
+      application/json:
+        result:
+          status: false
+          http_code: 429
+          info: 'Cuota de peticiones excedida'
+          trace_id: 123456abcde
+  #
+  # Respuesta a devolver cuando se produzcan errores no controlados.
+  standard_server_error_response:
+    description: Default error response
+    schema:
+      $ref: '#/definitions/standard_response'
+    examples:
+      application/json:
+        result:
+          status: false
+          http_code: 500
+          info: 'Error desconocido'
+          trace_id: 123456abcde
+          errors:
+          - code: 2000
+            message: Mensaje de error
